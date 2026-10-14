@@ -1,73 +1,23 @@
 {
   "total_planned_batches": 50,
   "completed_batches": [
-    {
-      "batch_id": 1,
-      "branch": "batch-01-auth",
-      "scope": "CR17-UC01..03 (Registration, Login, JWT tokens)",
-      "status": "MERGED_TO_MAIN",
-      "pushed_to_remote": true
-    },
-    {
-      "batch_id": 2,
-      "branch": "batch-02-mfa-security",
-      "scope": "CR17-UC04..07 (MFA, TOTP Secret, Biometrics)",
-      "status": "MERGED_TO_MAIN",
-      "pushed_to_remote": true
-    },
-    {
-      "batch_id": 3,
-      "branch": "batch-03-password-reset",
-      "scope": "CR17-UC08..11 (Password recovery, verification tokens)",
-      "status": "MERGED_TO_MAIN",
-      "pushed_to_remote": true
-    },
-    {
-      "batch_id": 4,
-      "branch": "batch-04-privacy-controls",
-      "scope": "CR17-UC12..15 (Profile privacy, audit logs)",
-      "status": "MERGED_TO_MAIN",
-      "pushed_to_remote": true
-    },
-    {
-      "batch_id": 5,
-      "branch": "batch-05-gdpr-purge",
-      "scope": "CR17-UC16..20 (GDPR data export, account deletion)",
-      "status": "MERGED_TO_MAIN",
-      "pushed_to_remote": true
-    },
-    {
-      "batch_id": 6,
-      "branch": "batch-06-security-defense",
-      "scope": "CR15-UC01..06 (IP rate limiting, brute force lockout)",
-      "status": "MERGED_TO_MAIN",
-      "pushed_to_remote": true
-    },
-    {
-      "batch_id": 7,
-      "branch": "batch-07-camera-picker",
-      "scope": "CR01-UC01..04 (Photo capture, multi-image picker, cloud metadata)",
-      "status": "MERGED_TO_MAIN",
-      "pushed_to_remote": true
-    },
-    {
-      "batch_id": 8,
-      "branch": "batch-08-image-compression-queue",
-      "scope": "CR01-UC05..08 (Background upload queue, chunking, pause/resume)",
-      "status": "MERGED_TO_MAIN",
-      "pushed_to_remote": true
-    },
-    {
-      "batch_id": 9,
-      "branch": "batch-09-exif-sanitization",
-      "scope": "CR01-UC09..12 (EXIF & GPS metadata sanitization, client privacy modal)",
-      "status": "MERGED_TO_MAIN",
-      "pushed_to_remote": true
-    }
+    { "batch_id": 1, "branch": "batch-01-auth", "scope": "CR17-UC01..03 (Auth)", "status": "MERGED_TO_MAIN", "pushed_to_remote": true },
+    { "batch_id": 2, "branch": "batch-02-mfa-security", "scope": "CR17-UC04..07 (MFA & Biometrics)", "status": "MERGED_TO_MAIN", "pushed_to_remote": true },
+    { "batch_id": 3, "branch": "batch-03-password-reset", "scope": "CR17-UC08..11 (Password recovery)", "status": "MERGED_TO_MAIN", "pushed_to_remote": true },
+    { "batch_id": 4, "branch": "batch-04-privacy-controls", "scope": "CR17-UC12..15 (Profile privacy)", "status": "MERGED_TO_MAIN", "pushed_to_remote": true },
+    { "batch_id": 5, "branch": "batch-05-gdpr-purge", "scope": "CR17-UC16..20 (GDPR export)", "status": "MERGED_TO_MAIN", "pushed_to_remote": true },
+    { "batch_id": 6, "branch": "batch-06-security-defense", "scope": "CR15-UC01..06 (Rate limiting)", "status": "MERGED_TO_MAIN", "pushed_to_remote": true },
+    { "batch_id": 7, "branch": "batch-07-camera-picker", "scope": "CR01-UC01..04 (Photo picker)", "status": "MERGED_TO_MAIN", "pushed_to_remote": true },
+    { "batch_id": 8, "branch": "batch-08-image-compression-queue", "scope": "CR01-UC05..08 (Upload queue)", "status": "MERGED_TO_MAIN", "pushed_to_remote": true },
+    { "batch_id": 9, "branch": "batch-09-exif-sanitization", "scope": "CR01-UC09..12 (EXIF sanitization)", "status": "MERGED_TO_MAIN", "pushed_to_remote": true },
+    { "batch_id": 10, "branch": "batch-10-duplicate-detection", "scope": "CR01-UC13..16 (Duplicate photo detection & resolution)", "status": "MERGED_TO_MAIN", "pushed_to_remote": true },
+    { "batch_id": 11, "branch": "batch-11-clothing-categorizer", "scope": "CR02-UC01..04 (Clothing categories catalog)", "status": "MERGED_TO_MAIN", "pushed_to_remote": true },
+    { "batch_id": 12, "branch": "batch-12-clothing-items", "scope": "CR02-UC05..08 (Individual wardrobe item CRUD)", "status": "MERGED_TO_MAIN", "pushed_to_remote": true },
+    { "batch_id": 13, "branch": "batch-13-smart-tagging", "scope": "CR02-UC09..12 (Smart tagging & taxonomy)", "status": "MERGED_TO_MAIN", "pushed_to_remote": true }
   ],
-  "next_batch_index": 10,
-  "next_batch_scope": "CR01-UC13..16 (Duplicate photo detection & resolution)",
+  "next_batch_index": 14,
+  "next_batch_scope": "CR02-UC13..16 (Wardrobe filtering, sorting & search engine)",
   "active_cycle_completed_count": 4,
   "laptop_memory_safe_cap": 4,
-  "updated_at": "2026-10-14T10:46:30-04:00"
+  "updated_at": "2026-10-14T10:55:10-04:00"
 }

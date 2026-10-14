@@ -1,0 +1,25 @@
+{
+  "job_id": "JOB-B14-DB-001",
+  "cr_id": "CR02",
+  "uc_id": "UC13",
+  "task_id": "T01",
+  "subtask_ids": ["B14-DB-ST01"],
+  "priority": "P0",
+  "owner_request": "Write Flyway migration V14__create_saved_filters_table.sql for MySQL with utf8mb4 encoding:\nCREATE TABLE saved_wardrobe_filters (\n  id BIGINT AUTO_INCREMENT PRIMARY KEY,\n  user_id BIGINT NOT NULL,\n  filter_name VARCHAR(100) NOT NULL,\n  category_ids JSON NULL,\n  color_hex_list JSON NULL,\n  seasons JSON NULL,\n  tags JSON NULL,\n  sort_by VARCHAR(50) NOT NULL DEFAULT 'CREATED_DESC',\n  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  CONSTRAINT fk_filter_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,\n  INDEX idx_filter_user (user_id)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;",
+  "worker_role": "AGENT_C_QA",
+  "key_alias": "KEY_C",
+  "model": "claude-haiku-5-5",
+  "allowed_paths": [
+    "backend/src/main/resources/db/migration/V14__create_saved_filters_table.sql"
+  ],
+  "forbidden_paths": [
+    "AGENTS.md",
+    "tools/*",
+    "mobile/*",
+    "reports/*"
+  ],
+  "context_files": [],
+  "max_task_usd": 1.00,
+  "required_tests": [],
+  "approval_status": "APPROVED"
+}
