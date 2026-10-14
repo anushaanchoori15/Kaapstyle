@@ -17,11 +17,14 @@
     { "batch_id": 14, "branch": "batch-14-wardrobe-filters", "scope": "CR02-UC13..16 (Wardrobe search & filters)", "status": "MERGED_TO_MAIN", "pushed_to_remote": true },
     { "batch_id": 15, "branch": "batch-15-outfit-builder", "scope": "CR03-UC01..04 (Outfit canvas builder)", "status": "MERGED_TO_MAIN", "pushed_to_remote": true },
     { "batch_id": 16, "branch": "batch-16-color-palette", "scope": "CR03-UC05..08 (Color harmonies & palette)", "status": "MERGED_TO_MAIN", "pushed_to_remote": true },
-    { "batch_id": 17, "branch": "batch-17-outfit-calendar", "scope": "CR03-UC09..12 (Outfit scheduling calendar)", "status": "MERGED_TO_MAIN", "pushed_to_remote": true }
+    { "batch_id": 17, "branch": "batch-17-outfit-calendar", "scope": "CR03-UC09..12 (Outfit scheduling calendar)", "status": "MERGED_TO_MAIN", "pushed_to_remote": true },
+    { "batch_id": 18, "branch": "batch-18-wear-history", "scope": "CR03-UC13..16 (Wear history & rotation analytics)", "status": "MERGED_TO_MAIN", "pushed_to_remote": true },
+    { "batch_id": 19, "branch": "batch-19-capsule-wardrobe", "scope": "CR04-UC01..04 (Capsule wardrobe collection quotas)", "status": "MERGED_TO_MAIN", "pushed_to_remote": true },
+    { "batch_id": 20, "branch": "batch-20-laundry-tracker", "scope": "CR05-UC01..04 (Laundry status & fabric care tags)", "status": "MERGED_TO_MAIN", "pushed_to_remote": true }
   ],
-  "next_batch_index": 18,
-  "next_batch_scope": "CR03-UC13..16 (Outfit history & re-wear prevention analytics)",
-  "active_cycle_completed_count": 4,
+  "next_batch_index": 21,
+  "next_batch_scope": "CR05-UC05..08 (Dry cleaning logs & laundry reminders)",
+  "active_cycle_completed_count": 3,
   "laptop_memory_safe_cap": 4,
-  "updated_at": "2026-10-14T11:08:15-04:00"
+  "updated_at": "2026-10-14T11:15:00-04:00"
 }
