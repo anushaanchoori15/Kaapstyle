@@ -1,0 +1,25 @@
+{
+  "job_id": "JOB-B25-DB-001",
+  "cr_id": "CR08",
+  "uc_id": "UC01",
+  "task_id": "T01",
+  "subtask_ids": ["B25-DB-ST01"],
+  "priority": "P0",
+  "owner_request": "Write Flyway migration V25__create_packing_lists_tables.sql for MySQL with utf8mb4 encoding:\nCREATE TABLE travel_trips (\n  id BIGINT AUTO_INCREMENT PRIMARY KEY,\n  user_id BIGINT NOT NULL,\n  destination VARCHAR(150) NOT NULL,\n  start_date DATE NOT NULL,\n  end_date DATE NOT NULL,\n  trip_type VARCHAR(50) NOT NULL DEFAULT 'LEISURE',\n  weather_expected VARCHAR(100) NULL,\n  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  CONSTRAINT fk_trip_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,\n  INDEX idx_trip_user (user_id)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;\n\nCREATE TABLE packing_list_items (\n  id BIGINT AUTO_INCREMENT PRIMARY KEY,\n  trip_id BIGINT NOT NULL,\n  item_id BIGINT NULL,\n  custom_name VARCHAR(150) NOT NULL,\n  quantity INT NOT NULL DEFAULT 1,\n  is_packed BOOLEAN NOT NULL DEFAULT FALSE,\n  CONSTRAINT fk_pack_trip FOREIGN KEY (trip_id) REFERENCES travel_trips(id) ON DELETE CASCADE,\n  CONSTRAINT fk_pack_item FOREIGN KEY (item_id) REFERENCES wardrobe_items(id) ON DELETE SET NULL,\n  INDEX idx_pack_trip (trip_id)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;",
+  "worker_role": "AGENT_C_QA",
+  "key_alias": "KEY_C",
+  "model": "claude-haiku-5-5",
+  "allowed_paths": [
+    "backend/src/main/resources/db/migration/V25__create_packing_lists_tables.sql"
+  ],
+  "forbidden_paths": [
+    "AGENTS.md",
+    "tools/*",
+    "mobile/*",
+    "reports/*"
+  ],
+  "context_files": [],
+  "max_task_usd": 1.00,
+  "required_tests": [],
+  "approval_status": "APPROVED"
+}

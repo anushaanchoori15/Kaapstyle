@@ -20,11 +20,15 @@
     { "batch_id": 17, "branch": "batch-17-outfit-calendar", "scope": "CR03-UC09..12 (Outfit scheduling calendar)", "status": "MERGED_TO_MAIN", "pushed_to_remote": true },
     { "batch_id": 18, "branch": "batch-18-wear-history", "scope": "CR03-UC13..16 (Wear history & rotation analytics)", "status": "MERGED_TO_MAIN", "pushed_to_remote": true },
     { "batch_id": 19, "branch": "batch-19-capsule-wardrobe", "scope": "CR04-UC01..04 (Capsule wardrobe collection quotas)", "status": "MERGED_TO_MAIN", "pushed_to_remote": true },
-    { "batch_id": 20, "branch": "batch-20-laundry-tracker", "scope": "CR05-UC01..04 (Laundry status & fabric care tags)", "status": "MERGED_TO_MAIN", "pushed_to_remote": true }
+    { "batch_id": 20, "branch": "batch-20-laundry-tracker", "scope": "CR05-UC01..04 (Laundry status & fabric care tags)", "status": "MERGED_TO_MAIN", "pushed_to_remote": true },
+    { "batch_id": 21, "branch": "batch-21-dry-cleaning", "scope": "CR05-UC05..08 (Dry cleaning orders & tickets)", "status": "MERGED_TO_MAIN", "pushed_to_remote": true },
+    { "batch_id": 22, "branch": "batch-22-size-fit", "scope": "CR06-UC01..04 (Body measurements & size profiles)", "status": "MERGED_TO_MAIN", "pushed_to_remote": true },
+    { "batch_id": 23, "branch": "batch-23-kids-uniforms", "scope": "CR07-UC01..04 (Kids school uniform schedules)", "status": "MERGED_TO_MAIN", "pushed_to_remote": true },
+    { "batch_id": 24, "branch": "batch-24-kids-growth", "scope": "CR07-UC05..08 (Kids growth logs & outgrow alerts)", "status": "MERGED_TO_MAIN", "pushed_to_remote": true }
   ],
-  "next_batch_index": 21,
-  "next_batch_scope": "CR05-UC05..08 (Dry cleaning logs & laundry reminders)",
-  "active_cycle_completed_count": 3,
+  "next_batch_index": 25,
+  "next_batch_scope": "CR08-UC01..04 (Packing list generator & travel luggage manager)",
+  "active_cycle_completed_count": 4,
   "laptop_memory_safe_cap": 4,
-  "updated_at": "2026-10-14T11:15:00-04:00"
+  "updated_at": "2026-10-14T11:26:00-04:00"
 }
