@@ -1,0 +1,25 @@
+{
+  "job_id": "JOB-B23-DB-001",
+  "cr_id": "CR07",
+  "uc_id": "UC01",
+  "task_id": "T01",
+  "subtask_ids": ["B23-DB-ST01"],
+  "priority": "P0",
+  "owner_request": "Write Flyway migration V23__create_kids_uniforms_tables.sql for MySQL with utf8mb4 encoding:\nCREATE TABLE kids_profiles (\n  id BIGINT AUTO_INCREMENT PRIMARY KEY,\n  guardian_id BIGINT NOT NULL,\n  child_name VARCHAR(100) NOT NULL,\n  birth_date DATE NULL,\n  school_name VARCHAR(150) NULL,\n  grade_level VARCHAR(30) NULL,\n  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  CONSTRAINT fk_kid_guardian FOREIGN KEY (guardian_id) REFERENCES users(id) ON DELETE CASCADE,\n  INDEX idx_kid_guardian (guardian_id)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;\n\nCREATE TABLE school_uniform_schedules (\n  id BIGINT AUTO_INCREMENT PRIMARY KEY,\n  kid_id BIGINT NOT NULL,\n  day_of_week VARCHAR(15) NOT NULL,\n  uniform_type VARCHAR(50) NOT NULL DEFAULT 'STANDARD',\n  notes VARCHAR(255) NULL,\n  CONSTRAINT fk_uni_kid FOREIGN KEY (kid_id) REFERENCES kids_profiles(id) ON DELETE CASCADE,\n  UNIQUE KEY uq_kid_day (kid_id, day_of_week)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;",
+  "worker_role": "AGENT_C_QA",
+  "key_alias": "KEY_C",
+  "model": "claude-haiku-5-5",
+  "allowed_paths": [
+    "backend/src/main/resources/db/migration/V23__create_kids_uniforms_tables.sql"
+  ],
+  "forbidden_paths": [
+    "AGENTS.md",
+    "tools/*",
+    "mobile/*",
+    "reports/*"
+  ],
+  "context_files": [],
+  "max_task_usd": 1.00,
+  "required_tests": [],
+  "approval_status": "APPROVED"
+}
