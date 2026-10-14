@@ -1,0 +1,25 @@
+{
+  "job_id": "JOB-B30-DB-001",
+  "cr_id": "CR11",
+  "uc_id": "UC01",
+  "task_id": "T01",
+  "subtask_ids": ["B30-DB-ST01"],
+  "priority": "P0",
+  "owner_request": "Write Flyway migration V30__create_clothing_budget_tables.sql for MySQL with utf8mb4 encoding:\nCREATE TABLE wardrobe_expenses (\n  id BIGINT AUTO_INCREMENT PRIMARY KEY,\n  user_id BIGINT NOT NULL,\n  item_id BIGINT NULL,\n  amount DECIMAL(10,2) NOT NULL,\n  currency VARCHAR(10) NOT NULL DEFAULT 'USD',\n  expense_category VARCHAR(50) NOT NULL DEFAULT 'PURCHASE',\n  purchase_date DATE NOT NULL,\n  retailer_name VARCHAR(150) NULL,\n  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  CONSTRAINT fk_exp_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,\n  CONSTRAINT fk_exp_item FOREIGN KEY (item_id) REFERENCES wardrobe_items(id) ON DELETE SET NULL,\n  INDEX idx_exp_user_date (user_id, purchase_date)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;",
+  "worker_role": "AGENT_C_QA",
+  "key_alias": "KEY_C",
+  "model": "claude-sonnet-5-5",
+  "allowed_paths": [
+    "backend/src/main/resources/db/migration/V30__create_clothing_budget_tables.sql"
+  ],
+  "forbidden_paths": [
+    "AGENTS.md",
+    "tools/*",
+    "mobile/*",
+    "reports/*"
+  ],
+  "context_files": [],
+  "max_task_usd": 1.50,
+  "required_tests": [],
+  "approval_status": "APPROVED"
+}
