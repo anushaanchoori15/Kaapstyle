@@ -1,0 +1,25 @@
+{
+  "job_id": "JOB-B32-DB-001",
+  "cr_id": "CR11",
+  "uc_id": "UC09",
+  "task_id": "T01",
+  "subtask_ids": ["B32-DB-ST01"],
+  "priority": "P0",
+  "owner_request": "Write Flyway migration V32__create_brand_analytics_tables.sql for MySQL with utf8mb4 encoding:\nCREATE TABLE brand_analytics_snapshots (\n  id BIGINT AUTO_INCREMENT PRIMARY KEY,\n  user_id BIGINT NOT NULL,\n  brand_name VARCHAR(100) NOT NULL,\n  item_count INT NOT NULL DEFAULT 1,\n  total_spend DECIMAL(10,2) NOT NULL DEFAULT 0.00,\n  avg_cpw DECIMAL(10,2) NOT NULL DEFAULT 0.00,\n  satisfaction_score DECIMAL(3,2) NOT NULL DEFAULT 5.00,\n  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  CONSTRAINT fk_brand_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,\n  INDEX idx_brand_user (user_id, brand_name)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;",
+  "worker_role": "AGENT_C_QA",
+  "key_alias": "KEY_C",
+  "model": "claude-sonnet-5-5",
+  "allowed_paths": [
+    "backend/src/main/resources/db/migration/V32__create_brand_analytics_tables.sql"
+  ],
+  "forbidden_paths": [
+    "AGENTS.md",
+    "tools/*",
+    "mobile/*",
+    "reports/*"
+  ],
+  "context_files": [],
+  "max_task_usd": 1.50,
+  "required_tests": [],
+  "approval_status": "APPROVED"
+}
