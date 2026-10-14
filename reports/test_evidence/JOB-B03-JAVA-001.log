@@ -1,0 +1,237 @@
+JOB ID: JOB-B03-JAVA-001
+MODE: LIVE API CALL
+REQUEST ID: req_011Cg2FzDF28UmyUe2gTVU2F
+MODEL: claude-sonnet-5-5
+STOP REASON: end_turn
+IS TRUNCATED: False
+COST USD: 0.037923
+APPLIED FILES:
+  - backend/src/main/java/com/kaapstyle/auth/model/PasswordResetToken.java: Successfully written: backend\src\main\java\com\kaapstyle\auth\model\PasswordResetToken.java
+  - backend/src/main/java/com/kaapstyle/auth/repository/PasswordResetTokenRepository.java: Successfully written: backend\src\main\java\com\kaapstyle\auth\repository\PasswordResetTokenRepository.java
+  - backend/src/main/java/com/kaapstyle/auth/model/EmailVerificationToken.java: Successfully written: backend\src\main\java\com\kaapstyle\auth\model\EmailVerificationToken.java
+  - backend/src/main/java/com/kaapstyle/auth/repository/EmailVerificationTokenRepository.java: Successfully written: backend\src\main\java\com\kaapstyle\auth\repository\EmailVerificationTokenRepository.java
+
+RAW OUTPUT:
+***FILE: backend/src/main/java/com/kaapstyle/auth/model/PasswordResetToken.java***
+package com.kaapstyle.auth.model;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
+
+import java.time.Instant;
+
+@Entity
+@Table(name = "password_reset_tokens")
+public class PasswordResetToken {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
+
+    @Column(name = "token_hash", nullable = false)
+    private String tokenHash;
+
+    @Column(name = "expires_at", nullable = false)
+    private Instant expiresAt;
+
+    @Column(name = "is_used", nullable = false)
+    private boolean isUsed = false;
+
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Instant createdAt;
+
+    public PasswordResetToken() {
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        if (this.createdAt == null) {
+            this.createdAt = Instant.now();
+        }
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public String getTokenHash() {
+        return tokenHash;
+    }
+
+    public void setTokenHash(String tokenHash) {
+        this.tokenHash = tokenHash;
+    }
+
+    public Instant getExpiresAt() {
+        return expiresAt;
+    }
+
+    public void setExpiresAt(Instant expiresAt) {
+        this.expiresAt = expiresAt;
+    }
+
+    public boolean isUsed() {
+        return isUsed;
+    }
+
+    public void setUsed(boolean used) {
+        this.isUsed = used;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
+}
+***END_FILE***
+
+***FILE: backend/src/main/java/com/kaapstyle/auth/repository/PasswordResetTokenRepository.java***
+package com.kaapstyle.auth.repository;
+
+import com.kaapstyle.auth.model.PasswordResetToken;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
+
+@Repository
+public interface PasswordResetTokenRepository extends JpaRepository<PasswordResetToken, Long> {
+
+    Optional<PasswordResetToken> findByTokenHash(String tokenHash);
+}
+***END_FILE***
+
+***FILE: backend/src/main/java/com/kaapstyle/auth/model/EmailVerificationToken.java***
+package com.kaapstyle.auth.model;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
+
+import java.time.Instant;
+
+@Entity
+@Table(name = "email_verification_tokens")
+public class EmailVerificationToken {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
+
+    @Column(name = "token_hash", nullable = false)
+    private String tokenHash;
+
+    @Column(name = "expires_at", nullable = false)
+    private Instant expiresAt;
+
+    @Column(name = "is_used", nullable = false)
+    private boolean isUsed = false;
+
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Instant createdAt;
+
+    public EmailVerificationToken() {
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        if (this.createdAt == null) {
+            this.createdAt = Instant.now();
+        }
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public String getTokenHash() {
+        return tokenHash;
+    }
+
+    public void setTokenHash(String tokenHash) {
+        this.tokenHash = tokenHash;
+    }
+
+    public Instant getExpiresAt() {
+        return expiresAt;
+    }
+
+    public void setExpiresAt(Instant expiresAt) {
+        this.expiresAt = expiresAt;
+    }
+
+    public boolean isUsed() {
+        return isUsed;
+    }
+
+    public void setUsed(boolean used) {
+        this.isUsed = used;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
+}
+***END_FILE***
+
+***FILE: backend/src/main/java/com/kaapstyle/auth/repository/EmailVerificationTokenRepository.java***
+package com.kaapstyle.auth.repository;
+
+import com.kaapstyle.auth.model.EmailVerificationToken;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
+
+@Repository
+public interface EmailVerificationTokenRepository extends JpaRepository<EmailVerificationToken, Long> {
+
+    Optional<EmailVerificationToken> findByTokenHash(String tokenHash);
+}
+***END_FILE***

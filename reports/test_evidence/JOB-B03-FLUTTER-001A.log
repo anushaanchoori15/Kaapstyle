@@ -1,0 +1,352 @@
+JOB ID: JOB-B03-FLUTTER-001A
+MODE: LIVE API CALL
+REQUEST ID: req_011Cg2G6JedL3VE6SdDsA3c4
+MODEL: claude-sonnet-5-5
+STOP REASON: end_turn
+IS TRUNCATED: False
+COST USD: 0.064641
+APPLIED FILES:
+  - mobile/lib/features/auth/screens/forgot_password_screen.dart: Successfully written: mobile\lib\features\auth\screens\forgot_password_screen.dart
+
+RAW OUTPUT:
+***FILE: mobile/lib/features/auth/screens/forgot_password_screen.dart***
+```dart
+import 'dart:async';
+import 'dart:convert';
+
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+
+/// Signature for the function that performs the forgot-password request.
+/// Allows the API call to be injected (e.g. for tests or a shared API client).
+typedef ForgotPasswordRequest = Future<void> Function(String email);
+
+/// Thrown when the forgot-password request fails with a user-presentable message.
+class ForgotPasswordException implements Exception {
+  final String message;
+  const ForgotPasswordException(this.message);
+
+  @override
+  String toString() => message;
+}
+
+/// Screen that lets a user request a password recovery email.
+///
+/// Calls `POST /api/auth/recovery/forgot-password` with `{ "email": ... }`.
+class ForgotPasswordScreen extends StatefulWidget {
+  /// Optional override for the network call. Defaults to an HTTP call against
+  /// [apiBaseUrl].
+  final ForgotPasswordRequest? onSubmitRequest;
+
+  /// Base URL of the backend. Can be supplied at build time using
+  /// `--dart-define=API_BASE_URL=https://example.com`.
+  final String apiBaseUrl;
+
+  /// Route name used to return to the login screen when there is nothing to pop.
+  final String loginRouteName;
+
+  const ForgotPasswordScreen({
+    super.key,
+    this.onSubmitRequest,
+    this.apiBaseUrl = const String.fromEnvironment('API_BASE_URL'),
+    this.loginRouteName = '/login',
+  });
+
+  @override
+  State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
+}
+
+class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
+  static const String _endpointPath = '/api/auth/recovery/forgot-password';
+  static const Duration _requestTimeout = Duration(seconds: 15);
+  static final RegExp _emailRegex =
+      RegExp(r'^[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}$');
+
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final TextEditingController _emailController = TextEditingController();
+
+  bool _isLoading = false;
+  bool _emailSent = false;
+  String? _errorMessage;
+  String _submittedEmail = '';
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    super.dispose();
+  }
+
+  String? _validateEmail(String? value) {
+    final email = value?.trim() ?? '';
+    if (email.isEmpty) {
+      return 'Please enter your email address';
+    }
+    if (!_emailRegex.hasMatch(email)) {
+      return 'Please enter a valid email address';
+    }
+    return null;
+  }
+
+  Future<void> _defaultRequest(String email) async {
+    final uri = Uri.parse('${widget.apiBaseUrl}$_endpointPath');
+    final http.Response response = await http
+        .post(
+          uri,
+          headers: const {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+          body: jsonEncode({'email': email}),
+        )
+        .timeout(_requestTimeout);
+
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      return;
+    }
+
+    if (response.statusCode == 429) {
+      throw const ForgotPasswordException(
+        'Too many requests. Please wait a moment and try again.',
+      );
+    }
+    if (response.statusCode == 400 || response.statusCode == 422) {
+      throw const ForgotPasswordException(
+        'The email address provided is not valid.',
+      );
+    }
+    throw const ForgotPasswordException(
+      'Something went wrong. Please try again later.',
+    );
+  }
+
+  Future<void> _submit() async {
+    FocusScope.of(context).unfocus();
+    if (_isLoading) return;
+    if (!(_formKey.currentState?.validate() ?? false)) return;
+
+    final email = _emailController.text.trim();
+
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      final request = widget.onSubmitRequest ?? _defaultRequest;
+      await request(email);
+      if (!mounted) return;
+      setState(() {
+        _isLoading = false;
+        _emailSent = true;
+        _submittedEmail = email;
+      });
+    } on ForgotPasswordException catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _isLoading = false;
+        _errorMessage = e.message;
+      });
+    } on TimeoutException {
+      if (!mounted) return;
+      setState(() {
+        _isLoading = false;
+        _errorMessage = 'The request timed out. Please try again.';
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _isLoading = false;
+        _errorMessage =
+            'Unable to reach the server. Check your connection and try again.';
+      });
+    }
+  }
+
+  void _goToLogin() {
+    final navigator = Navigator.of(context);
+    if (navigator.canPop()) {
+      navigator.pop();
+    } else {
+      navigator.pushReplacementNamed(widget.loginRouteName);
+    }
+  }
+
+  void _resetToForm() {
+    setState(() {
+      _emailSent = false;
+      _errorMessage = null;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Forgot Password'),
+        leading: BackButton(onPressed: _goToLogin),
+      ),
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 420),
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 250),
+                child: _emailSent
+                    ? _buildSuccessState(context)
+                    : _buildFormState(context),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFormState(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Form(
+      key: _formKey,
+      child: Column(
+        key: const ValueKey('forgot_password_form'),
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Icon(
+            Icons.lock_reset,
+            size: 72,
+            color: theme.colorScheme.primary,
+          ),
+          const SizedBox(height: 24),
+          Text(
+            'Reset your password',
+            textAlign: TextAlign.center,
+            style: theme.textTheme.headlineSmall,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Enter the email address associated with your account and we '
+            'will send you instructions to reset your password.',
+            textAlign: TextAlign.center,
+            style: theme.textTheme.bodyMedium,
+          ),
+          const SizedBox(height: 24),
+          TextFormField(
+            controller: _emailController,
+            enabled: !_isLoading,
+            keyboardType: TextInputType.emailAddress,
+            textInputAction: TextInputAction.done,
+            autofillHints: const [AutofillHints.email],
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            validator: _validateEmail,
+            onFieldSubmitted: (_) => _submit(),
+            decoration: const InputDecoration(
+              labelText: 'Email',
+              hintText: 'you@example.com',
+              prefixIcon: Icon(Icons.email_outlined),
+              border: OutlineInputBorder(),
+            ),
+          ),
+          if (_errorMessage != null) ...[
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.errorContainer,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.error_outline,
+                      color: theme.colorScheme.onErrorContainer),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      _errorMessage!,
+                      style: TextStyle(
+                        color: theme.colorScheme.onErrorContainer,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+          const SizedBox(height: 24),
+          SizedBox(
+            height: 48,
+            child: ElevatedButton(
+              onPressed: _isLoading ? null : _submit,
+              child: _isLoading
+                  ? const SizedBox(
+                      height: 22,
+                      width: 22,
+                      child: CircularProgressIndicator(strokeWidth: 2.5),
+                    )
+                  : const Text('Send Recovery Email'),
+            ),
+          ),
+          const SizedBox(height: 12),
+          TextButton(
+            onPressed: _isLoading ? null : _goToLogin,
+            child: const Text('Back to Login'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSuccessState(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Column(
+      key: const ValueKey('forgot_password_success'),
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Icon(
+          Icons.mark_email_read_outlined,
+          size: 72,
+          color: theme.colorScheme.primary,
+        ),
+        const SizedBox(height: 24),
+        Text(
+          'Check your email',
+          textAlign: TextAlign.center,
+          style: theme.textTheme.headlineSmall,
+        ),
+        const SizedBox(height: 12),
+        Text(
+          'If an account exists for $_submittedEmail, we have sent '
+          'password recovery instructions to it.',
+          textAlign: TextAlign.center,
+          style: theme.textTheme.bodyMedium,
+        ),
+        const SizedBox(height: 16),
+        Text(
+          '• Open the email and follow the link to reset your password.\n'
+          '• The link may take a few minutes to arrive.\n'
+          '• Check your spam or junk folder if you do not see it.',
+          style: theme.textTheme.bodyMedium,
+        ),
+        const SizedBox(height: 24),
+        SizedBox(
+          height: 48,
+          child: ElevatedButton(
+            onPressed: _goToLogin,
+            child: const Text('Back to Login'),
+          ),
+        ),
+        const SizedBox(height: 12),
+        TextButton(
+          onPressed: _resetToForm,
+          child: const Text('Use a different email'),
+        ),
+      ],
+    );
+  }
+}
+```
+***END_FILE***

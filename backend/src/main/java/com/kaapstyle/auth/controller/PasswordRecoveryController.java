@@ -1,0 +1,94 @@
+package com.kaapstyle.auth.controller;
+
+import com.kaapstyle.auth.service.PasswordRecoveryService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+/**
+ * REST controller exposing password recovery and email verification endpoints.
+ */
+@RestController
+@RequestMapping("/api/auth/recovery")
+@CrossOrigin
+public class PasswordRecoveryController {
+
+    private static final String FORGOT_PASSWORD_MESSAGE = "If account exists, instructions have been sent.";
+
+    private final PasswordRecoveryService passwordRecoveryService;
+
+    public PasswordRecoveryController(PasswordRecoveryService passwordRecoveryService) {
+        this.passwordRecoveryService = passwordRecoveryService;
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<Map<String, Object>> forgotPassword(@RequestBody Map<String, String> request) {
+        String email = requireField(request, "email");
+        passwordRecoveryService.requestPasswordReset(email);
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("message", FORGOT_PASSWORD_MESSAGE);
+        return ResponseEntity.ok(body);
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<Map<String, Object>> resetPassword(@RequestBody Map<String, String> request) {
+        String token = requireField(request, "token");
+        String newPassword = requireField(request, "newPassword");
+        passwordRecoveryService.resetPassword(token, newPassword);
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("success", true);
+        return ResponseEntity.ok(body);
+    }
+
+    @PostMapping("/verify-email")
+    public ResponseEntity<Map<String, Object>> verifyEmail(@RequestBody Map<String, String> request) {
+        String token = requireField(request, "token");
+        passwordRecoveryService.verifyEmail(token);
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("verified", true);
+        return ResponseEntity.ok(body);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Map<String, Object>> handleIllegalArgument(IllegalArgumentException ex) {
+        return buildError(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<Map<String, Object>> handleResponseStatus(ResponseStatusException ex) {
+        HttpStatus status = HttpStatus.resolve(ex.getStatusCode().value());
+        if (status == null) {
+            status = HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+        String message = ex.getReason() != null ? ex.getReason() : status.getReasonPhrase();
+        return buildError(status, message);
+    }
+
+    private String requireField(Map<String, String> request, String field) {
+        if (request == null) {
+            throw new IllegalArgumentException("Request body is required.");
+        }
+        String value = request.get(field);
+        if (value == null || value.isBlank()) {
+            throw new IllegalArgumentException("Field '" + field + "' is required.");
+        }
+        return value;
+    }
+
+    private ResponseEntity<Map<String, Object>> buildError(HttpStatus status, String message) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("success", false);
+        body.put("status", status.value());
+        body.put("error", message);
+        return ResponseEntity.status(status).body(body);
+    }
+}
