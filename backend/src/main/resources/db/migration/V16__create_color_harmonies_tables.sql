@@ -1,0 +1,18 @@
+-- V16__create_color_harmonies_tables.sql
+-- Traceability: CR03 -> UC05 -> T01 (B16-DB-ST01)
+-- Creates color_rules table (utf8mb4) and seeds initial harmony rules.
+
+CREATE TABLE color_rules (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  rule_name VARCHAR(100) NOT NULL,
+  rule_type VARCHAR(50) NOT NULL,
+  base_color_hex VARCHAR(10) NOT NULL,
+  matching_colors_hex JSON NOT NULL,
+  harmony_score DECIMAL(3,2) NOT NULL DEFAULT 1.00,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+INSERT INTO color_rules (rule_name, rule_type, base_color_hex, matching_colors_hex, harmony_score) VALUES
+('Navy & White Classic', 'COMPLEMENTARY', '#000080', '["#FFFFFF", "#D3D3D3", "#F5F5DC"]', 0.98),
+('Black & Camel Neutral', 'NEUTRAL_WARM', '#000000', '["#C19A6B", "#F5F5DC", "#E5E4E2"]', 0.95),
+('Olive & Cream Earth', 'ANALOGOUS_EARTH', '#556B2F', '["#FFFDD0", "#8B5A2B", "#FAF0E6"]', 0.92);
