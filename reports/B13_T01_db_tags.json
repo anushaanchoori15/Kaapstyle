@@ -1,0 +1,25 @@
+{
+  "job_id": "JOB-B13-DB-001",
+  "cr_id": "CR02",
+  "uc_id": "UC09",
+  "task_id": "T01",
+  "subtask_ids": ["B13-DB-ST01"],
+  "priority": "P0",
+  "owner_request": "Write Flyway migration V13__create_wardrobe_tags_tables.sql for MySQL with utf8mb4 encoding:\nCREATE TABLE wardrobe_tags (\n  id BIGINT AUTO_INCREMENT PRIMARY KEY,\n  tag_name VARCHAR(50) NOT NULL UNIQUE,\n  tag_type VARCHAR(30) NOT NULL DEFAULT 'CUSTOM',\n  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;\n\nCREATE TABLE item_tag_mappings (\n  item_id BIGINT NOT NULL,\n  tag_id BIGINT NOT NULL,\n  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  PRIMARY KEY (item_id, tag_id),\n  CONSTRAINT fk_map_item FOREIGN KEY (item_id) REFERENCES wardrobe_items(id) ON DELETE CASCADE,\n  CONSTRAINT fk_map_tag FOREIGN KEY (tag_id) REFERENCES wardrobe_tags(id) ON DELETE CASCADE\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;\n\nINSERT INTO wardrobe_tags (tag_name, tag_type) VALUES\n('Casual', 'STYLE'),\n('Formal', 'STYLE'),\n('Summer', 'SEASON'),\n('Winter', 'SEASON'),\n('Work', 'OCCASION'),\n('Party', 'OCCASION'),\n('Sport', 'OCCASION');",
+  "worker_role": "AGENT_C_QA",
+  "key_alias": "KEY_C",
+  "model": "claude-haiku-5-5",
+  "allowed_paths": [
+    "backend/src/main/resources/db/migration/V13__create_wardrobe_tags_tables.sql"
+  ],
+  "forbidden_paths": [
+    "AGENTS.md",
+    "tools/*",
+    "mobile/*",
+    "reports/*"
+  ],
+  "context_files": [],
+  "max_task_usd": 1.00,
+  "required_tests": [],
+  "approval_status": "APPROVED"
+}
