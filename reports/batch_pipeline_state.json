@@ -10,14 +10,18 @@
     { "batch_id": 7, "branch": "batch-07-camera-picker", "scope": "CR01-UC01..04 (Photo picker)", "status": "MERGED_TO_MAIN", "pushed_to_remote": true },
     { "batch_id": 8, "branch": "batch-08-image-compression-queue", "scope": "CR01-UC05..08 (Upload queue)", "status": "MERGED_TO_MAIN", "pushed_to_remote": true },
     { "batch_id": 9, "branch": "batch-09-exif-sanitization", "scope": "CR01-UC09..12 (EXIF sanitization)", "status": "MERGED_TO_MAIN", "pushed_to_remote": true },
-    { "batch_id": 10, "branch": "batch-10-duplicate-detection", "scope": "CR01-UC13..16 (Duplicate photo detection & resolution)", "status": "MERGED_TO_MAIN", "pushed_to_remote": true },
-    { "batch_id": 11, "branch": "batch-11-clothing-categorizer", "scope": "CR02-UC01..04 (Clothing categories catalog)", "status": "MERGED_TO_MAIN", "pushed_to_remote": true },
-    { "batch_id": 12, "branch": "batch-12-clothing-items", "scope": "CR02-UC05..08 (Individual wardrobe item CRUD)", "status": "MERGED_TO_MAIN", "pushed_to_remote": true },
-    { "batch_id": 13, "branch": "batch-13-smart-tagging", "scope": "CR02-UC09..12 (Smart tagging & taxonomy)", "status": "MERGED_TO_MAIN", "pushed_to_remote": true }
+    { "batch_id": 10, "branch": "batch-10-duplicate-detection", "scope": "CR01-UC13..16 (Duplicate photo detection)", "status": "MERGED_TO_MAIN", "pushed_to_remote": true },
+    { "batch_id": 11, "branch": "batch-11-clothing-categorizer", "scope": "CR02-UC01..04 (Categories catalog)", "status": "MERGED_TO_MAIN", "pushed_to_remote": true },
+    { "batch_id": 12, "branch": "batch-12-clothing-items", "scope": "CR02-UC05..08 (Wardrobe item CRUD)", "status": "MERGED_TO_MAIN", "pushed_to_remote": true },
+    { "batch_id": 13, "branch": "batch-13-smart-tagging", "scope": "CR02-UC09..12 (Smart tagging)", "status": "MERGED_TO_MAIN", "pushed_to_remote": true },
+    { "batch_id": 14, "branch": "batch-14-wardrobe-filters", "scope": "CR02-UC13..16 (Wardrobe search & filters)", "status": "MERGED_TO_MAIN", "pushed_to_remote": true },
+    { "batch_id": 15, "branch": "batch-15-outfit-builder", "scope": "CR03-UC01..04 (Outfit canvas builder)", "status": "MERGED_TO_MAIN", "pushed_to_remote": true },
+    { "batch_id": 16, "branch": "batch-16-color-palette", "scope": "CR03-UC05..08 (Color harmonies & palette)", "status": "MERGED_TO_MAIN", "pushed_to_remote": true },
+    { "batch_id": 17, "branch": "batch-17-outfit-calendar", "scope": "CR03-UC09..12 (Outfit scheduling calendar)", "status": "MERGED_TO_MAIN", "pushed_to_remote": true }
   ],
-  "next_batch_index": 14,
-  "next_batch_scope": "CR02-UC13..16 (Wardrobe filtering, sorting & search engine)",
+  "next_batch_index": 18,
+  "next_batch_scope": "CR03-UC13..16 (Outfit history & re-wear prevention analytics)",
   "active_cycle_completed_count": 4,
   "laptop_memory_safe_cap": 4,
-  "updated_at": "2026-10-14T10:55:10-04:00"
+  "updated_at": "2026-10-14T11:08:15-04:00"
 }
