@@ -1,0 +1,25 @@
+{
+  "job_id": "JOB-B19-DB-001",
+  "cr_id": "CR04",
+  "uc_id": "UC01",
+  "task_id": "T01",
+  "subtask_ids": ["B19-DB-ST01"],
+  "priority": "P0",
+  "owner_request": "Write Flyway migration V19__create_capsule_wardrobes_tables.sql for MySQL with utf8mb4 encoding:\nCREATE TABLE capsule_wardrobes (\n  id BIGINT AUTO_INCREMENT PRIMARY KEY,\n  user_id BIGINT NOT NULL,\n  capsule_name VARCHAR(150) NOT NULL,\n  season VARCHAR(30) NOT NULL DEFAULT 'ALL_SEASON',\n  target_item_count INT NOT NULL DEFAULT 30,\n  description TEXT NULL,\n  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  CONSTRAINT fk_capsule_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,\n  INDEX idx_capsule_user (user_id)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;\n\nCREATE TABLE capsule_items (\n  capsule_id BIGINT NOT NULL,\n  item_id BIGINT NOT NULL,\n  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  PRIMARY KEY (capsule_id, item_id),\n  CONSTRAINT fk_cap_capsule FOREIGN KEY (capsule_id) REFERENCES capsule_wardrobes(id) ON DELETE CASCADE,\n  CONSTRAINT fk_cap_item FOREIGN KEY (item_id) REFERENCES wardrobe_items(id) ON DELETE CASCADE\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;",
+  "worker_role": "AGENT_C_QA",
+  "key_alias": "KEY_C",
+  "model": "claude-haiku-5-5",
+  "allowed_paths": [
+    "backend/src/main/resources/db/migration/V19__create_capsule_wardrobes_tables.sql"
+  ],
+  "forbidden_paths": [
+    "AGENTS.md",
+    "tools/*",
+    "mobile/*",
+    "reports/*"
+  ],
+  "context_files": [],
+  "max_task_usd": 1.00,
+  "required_tests": [],
+  "approval_status": "APPROVED"
+}
