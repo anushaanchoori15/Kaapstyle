@@ -1,0 +1,25 @@
+{
+  "job_id": "JOB-B26-DB-001",
+  "cr_id": "CR08",
+  "uc_id": "UC05",
+  "task_id": "T01",
+  "subtask_ids": ["B26-DB-ST01"],
+  "priority": "P0",
+  "owner_request": "Write Flyway migration V26__create_luggage_containers_tables.sql for MySQL with utf8mb4 encoding:\nCREATE TABLE luggage_containers (\n  id BIGINT AUTO_INCREMENT PRIMARY KEY,\n  trip_id BIGINT NOT NULL,\n  container_name VARCHAR(100) NOT NULL,\n  container_type VARCHAR(50) NOT NULL DEFAULT 'CHECK_IN',\n  max_weight_limit_kg DECIMAL(5,2) NOT NULL DEFAULT 23.00,\n  current_weight_kg DECIMAL(5,2) NOT NULL DEFAULT 0.00,\n  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  CONSTRAINT fk_lug_trip FOREIGN KEY (trip_id) REFERENCES travel_trips(id) ON DELETE CASCADE,\n  INDEX idx_lug_trip (trip_id)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;",
+  "worker_role": "AGENT_C_QA",
+  "key_alias": "KEY_C",
+  "model": "claude-haiku-5-5",
+  "allowed_paths": [
+    "backend/src/main/resources/db/migration/V26__create_luggage_containers_tables.sql"
+  ],
+  "forbidden_paths": [
+    "AGENTS.md",
+    "tools/*",
+    "mobile/*",
+    "reports/*"
+  ],
+  "context_files": [],
+  "max_task_usd": 1.00,
+  "required_tests": [],
+  "approval_status": "APPROVED"
+}
