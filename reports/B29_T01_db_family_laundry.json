@@ -1,0 +1,25 @@
+{
+  "job_id": "JOB-B29-DB-001",
+  "cr_id": "CR10",
+  "uc_id": "UC05",
+  "task_id": "T01",
+  "subtask_ids": ["B29-DB-ST01"],
+  "priority": "P0",
+  "owner_request": "Write Flyway migration V29__create_shared_laundry_tasks_tables.sql for MySQL with utf8mb4 encoding:\nCREATE TABLE family_laundry_tasks (\n  id BIGINT AUTO_INCREMENT PRIMARY KEY,\n  family_group_id BIGINT NOT NULL,\n  assigned_user_id BIGINT NULL,\n  task_title VARCHAR(150) NOT NULL,\n  item_count INT NOT NULL DEFAULT 1,\n  task_status VARCHAR(30) NOT NULL DEFAULT 'PENDING',\n  due_date DATE NULL,\n  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  CONSTRAINT fk_fam_laund_group FOREIGN KEY (family_group_id) REFERENCES family_groups(id) ON DELETE CASCADE,\n  CONSTRAINT fk_fam_laund_user FOREIGN KEY (assigned_user_id) REFERENCES users(id) ON DELETE SET NULL,\n  INDEX idx_fam_laund_status (family_group_id, task_status)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;",
+  "worker_role": "AGENT_C_QA",
+  "key_alias": "KEY_C",
+  "model": "claude-sonnet-5-5",
+  "allowed_paths": [
+    "backend/src/main/resources/db/migration/V29__create_shared_laundry_tasks_tables.sql"
+  ],
+  "forbidden_paths": [
+    "AGENTS.md",
+    "tools/*",
+    "mobile/*",
+    "reports/*"
+  ],
+  "context_files": [],
+  "max_task_usd": 1.50,
+  "required_tests": [],
+  "approval_status": "APPROVED"
+}

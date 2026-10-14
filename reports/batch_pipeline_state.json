@@ -24,11 +24,15 @@
     { "batch_id": 21, "branch": "batch-21-dry-cleaning", "scope": "CR05-UC05..08 (Dry cleaning orders & tickets)", "status": "MERGED_TO_MAIN", "pushed_to_remote": true },
     { "batch_id": 22, "branch": "batch-22-size-fit", "scope": "CR06-UC01..04 (Body measurements & size profiles)", "status": "MERGED_TO_MAIN", "pushed_to_remote": true },
     { "batch_id": 23, "branch": "batch-23-kids-uniforms", "scope": "CR07-UC01..04 (Kids school uniform schedules)", "status": "MERGED_TO_MAIN", "pushed_to_remote": true },
-    { "batch_id": 24, "branch": "batch-24-kids-growth", "scope": "CR07-UC05..08 (Kids growth logs & outgrow alerts)", "status": "MERGED_TO_MAIN", "pushed_to_remote": true }
+    { "batch_id": 24, "branch": "batch-24-kids-growth", "scope": "CR07-UC05..08 (Kids growth logs & outgrow alerts)", "status": "MERGED_TO_MAIN", "pushed_to_remote": true },
+    { "batch_id": 25, "branch": "batch-25-travel-packing", "scope": "CR08-UC01..04 (Packing list generator & travel luggage manager)", "status": "MERGED_TO_MAIN", "pushed_to_remote": true },
+    { "batch_id": 26, "branch": "batch-26-luggage-weight", "scope": "CR08-UC05..08 (Luggage weight allowance & bag containers)", "status": "MERGED_TO_MAIN", "pushed_to_remote": true },
+    { "batch_id": 27, "branch": "batch-27-weather-sync", "scope": "CR09-UC01..04 (Weather sync cache & outfit forecast suggestions)", "status": "MERGED_TO_MAIN", "pushed_to_remote": true },
+    { "batch_id": 28, "branch": "batch-28-family-sharing", "scope": "CR10-UC01..04 (Family groups & multi-member wardrobe sharing)", "status": "MERGED_TO_MAIN", "pushed_to_remote": true }
   ],
-  "next_batch_index": 25,
-  "next_batch_scope": "CR08-UC01..04 (Packing list generator & travel luggage manager)",
+  "next_batch_index": 29,
+  "next_batch_scope": "CR10-UC05..08 (Shared laundry delegation & family permissions)",
   "active_cycle_completed_count": 4,
   "laptop_memory_safe_cap": 4,
-  "updated_at": "2026-10-14T11:26:00-04:00"
+  "updated_at": "2026-10-14T11:46:40-04:00"
 }
