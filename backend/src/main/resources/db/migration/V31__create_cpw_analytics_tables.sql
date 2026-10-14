@@ -1,0 +1,15 @@
+-- V31: CPW (Cost Per Wear) analytics tables
+-- Hierarchy: CR11 -> UC05 -> T01 (B31-DB-ST01)
+
+CREATE TABLE item_cpw_summaries (
+  item_id BIGINT PRIMARY KEY,
+  user_id BIGINT NOT NULL,
+  purchase_price DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+  wear_count INT NOT NULL DEFAULT 0,
+  current_cpw DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+  value_score_rating VARCHAR(30) NOT NULL DEFAULT 'NEW',
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_cpw_item FOREIGN KEY (item_id) REFERENCES wardrobe_items(id) ON DELETE CASCADE,
+  CONSTRAINT fk_cpw_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  INDEX idx_cpw_user_score (user_id, value_score_rating)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

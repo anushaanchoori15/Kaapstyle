@@ -1,0 +1,25 @@
+{
+  "job_id": "JOB-B31-DB-001",
+  "cr_id": "CR11",
+  "uc_id": "UC05",
+  "task_id": "T01",
+  "subtask_ids": ["B31-DB-ST01"],
+  "priority": "P0",
+  "owner_request": "Write Flyway migration V31__create_cpw_analytics_tables.sql for MySQL with utf8mb4 encoding:\nCREATE TABLE item_cpw_summaries (\n  item_id BIGINT PRIMARY KEY,\n  user_id BIGINT NOT NULL,\n  purchase_price DECIMAL(10,2) NOT NULL DEFAULT 0.00,\n  wear_count INT NOT NULL DEFAULT 0,\n  current_cpw DECIMAL(10,2) NOT NULL DEFAULT 0.00,\n  value_score_rating VARCHAR(30) NOT NULL DEFAULT 'NEW',\n  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  CONSTRAINT fk_cpw_item FOREIGN KEY (item_id) REFERENCES wardrobe_items(id) ON DELETE CASCADE,\n  CONSTRAINT fk_cpw_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,\n  INDEX idx_cpw_user_score (user_id, value_score_rating)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;",
+  "worker_role": "AGENT_C_QA",
+  "key_alias": "KEY_C",
+  "model": "claude-sonnet-5-5",
+  "allowed_paths": [
+    "backend/src/main/resources/db/migration/V31__create_cpw_analytics_tables.sql"
+  ],
+  "forbidden_paths": [
+    "AGENTS.md",
+    "tools/*",
+    "mobile/*",
+    "reports/*"
+  ],
+  "context_files": [],
+  "max_task_usd": 1.50,
+  "required_tests": [],
+  "approval_status": "APPROVED"
+}
