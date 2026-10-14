@@ -1,0 +1,25 @@
+{
+  "job_id": "JOB-B01-JAVA-002B",
+  "cr_id": "CR17",
+  "uc_id": "UC01",
+  "task_id": "T03",
+  "subtask_ids": ["B01-JAVA-ST04"],
+  "priority": "P0",
+  "owner_request": "Implement backend/src/main/java/com/kaapstyle/auth/controller/AuthController.java only.\nIMPORTANT: Existing classes already exist and MUST be imported:\n- import com.kaapstyle.auth.dto.RegisterRequest;\n- import com.kaapstyle.auth.dto.LoginRequest;\n- import com.kaapstyle.auth.dto.AuthResponse;\n- import com.kaapstyle.auth.service.AuthService;\n\nRequirements:\n- @RestController, @RequestMapping('/api/auth'), @CrossOrigin\n- Autowire AuthService via constructor injection.\n- @PostMapping('/register'): accepts @Valid @RequestBody RegisterRequest req, returns ResponseEntity.status(HttpStatus.CREATED).body(authService.register(req))\n- @PostMapping('/login'): accepts @Valid @RequestBody LoginRequest req, returns ResponseEntity.ok(authService.login(req))\n- Include @ExceptionHandler methods for:\n  * IllegalArgumentException -> HttpStatus.BAD_REQUEST\n  * ResponseStatusException -> returns ex.getStatusCode() with error body\n  * MethodArgumentNotValidException -> HttpStatus.BAD_REQUEST with field error map",
+  "worker_role": "AGENT_B_JAVA",
+  "key_alias": "KEY_B",
+  "model": "claude-sonnet-5-5",
+  "allowed_paths": [
+    "backend/src/main/java/com/kaapstyle/auth/controller/AuthController.java"
+  ],
+  "forbidden_paths": [
+    "AGENTS.md",
+    "tools/*",
+    "mobile/*",
+    "reports/*"
+  ],
+  "context_files": [],
+  "max_task_usd": 1.50,
+  "required_tests": [],
+  "approval_status": "APPROVED"
+}

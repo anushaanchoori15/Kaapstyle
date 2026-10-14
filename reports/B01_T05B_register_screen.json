@@ -1,0 +1,25 @@
+{
+  "job_id": "JOB-B01-FLUTTER-002B",
+  "cr_id": "CR17",
+  "uc_id": "UC01",
+  "task_id": "T05",
+  "subtask_ids": ["B01-MOB-ST04"],
+  "priority": "P0",
+  "owner_request": "Implement Flutter RegisterScreen in mobile/lib/features/auth/screens/register_screen.dart only.\n- StatefulWidget with Form, GlobalKey<FormState>.\n- Input fields: First Name, Last Name, Email, Password, Confirm Password.\n- Password validator: at least 8 characters, confirmation matching check.\n- 'Create Account' button with loading indicator during submission.\n- Calls AuthApiService to register user and navigates or shows SnackBar on success/error.\n- Link to navigate back to LoginScreen.",
+  "worker_role": "AGENT_A_FLUTTER",
+  "key_alias": "KEY_A",
+  "model": "claude-sonnet-5-5",
+  "allowed_paths": [
+    "mobile/lib/features/auth/screens/register_screen.dart"
+  ],
+  "forbidden_paths": [
+    "AGENTS.md",
+    "tools/*",
+    "backend/*",
+    "reports/*"
+  ],
+  "context_files": [],
+  "max_task_usd": 1.50,
+  "required_tests": [],
+  "approval_status": "APPROVED"
+}
