@@ -1,0 +1,192 @@
+package com.kaapstyle.media.model;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
+
+import java.time.Instant;
+import java.util.Objects;
+
+/**
+ * JPA entity mapped to the {@code media_files} table (Flyway V7 schema).
+ */
+@Entity
+@Table(name = "media_files")
+public class MediaFile {
+
+    public static final String STATUS_PENDING = "PENDING";
+    public static final String STATUS_UPLOADED = "UPLOADED";
+    public static final String STATUS_FAILED = "FAILED";
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
+
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
+
+    @Column(name = "s3_key", nullable = false, unique = true)
+    private String s3Key;
+
+    @Column(name = "file_name", nullable = false)
+    private String fileName;
+
+    @Column(name = "mime_type", nullable = false)
+    private String mimeType;
+
+    @Column(name = "file_size_bytes", nullable = false)
+    private long fileSizeBytes;
+
+    @Column(name = "sha256_hash")
+    private String sha256Hash;
+
+    /** One of 'PENDING', 'UPLOADED', 'FAILED'. */
+    @Column(name = "upload_status", nullable = false)
+    private String uploadStatus = STATUS_PENDING;
+
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Instant createdAt;
+
+    @Column(name = "confirmed_at")
+    private Instant confirmedAt;
+
+    protected MediaFile() {
+        // required by JPA
+    }
+
+    public MediaFile(Long userId, String s3Key, String fileName, String mimeType,
+                     long fileSizeBytes, String sha256Hash) {
+        this.userId = userId;
+        this.s3Key = s3Key;
+        this.fileName = fileName;
+        this.mimeType = mimeType;
+        this.fileSizeBytes = fileSizeBytes;
+        this.sha256Hash = sha256Hash;
+        this.uploadStatus = STATUS_PENDING;
+    }
+
+    @PrePersist
+    void onCreate() {
+        if (createdAt == null) {
+            createdAt = Instant.now();
+        }
+        if (uploadStatus == null) {
+            uploadStatus = STATUS_PENDING;
+        }
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public String getS3Key() {
+        return s3Key;
+    }
+
+    public void setS3Key(String s3Key) {
+        this.s3Key = s3Key;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public String getMimeType() {
+        return mimeType;
+    }
+
+    public void setMimeType(String mimeType) {
+        this.mimeType = mimeType;
+    }
+
+    public long getFileSizeBytes() {
+        return fileSizeBytes;
+    }
+
+    public void setFileSizeBytes(long fileSizeBytes) {
+        this.fileSizeBytes = fileSizeBytes;
+    }
+
+    public String getSha256Hash() {
+        return sha256Hash;
+    }
+
+    public void setSha256Hash(String sha256Hash) {
+        this.sha256Hash = sha256Hash;
+    }
+
+    public String getUploadStatus() {
+        return uploadStatus;
+    }
+
+    public void setUploadStatus(String uploadStatus) {
+        this.uploadStatus = uploadStatus;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Instant getConfirmedAt() {
+        return confirmedAt;
+    }
+
+    public void setConfirmedAt(Instant confirmedAt) {
+        this.confirmedAt = confirmedAt;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof MediaFile other)) {
+            return false;
+        }
+        return id != null && Objects.equals(id, other.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "MediaFile{id=" + id
+                + ", userId=" + userId
+                + ", s3Key='" + s3Key + '\''
+                + ", fileName='" + fileName + '\''
+                + ", mimeType='" + mimeType + '\''
+                + ", fileSizeBytes=" + fileSizeBytes
+                + ", uploadStatus='" + uploadStatus + '\''
+                + ", createdAt=" + createdAt
+                + ", confirmedAt=" + confirmedAt
+                + '}';
+    }
+}

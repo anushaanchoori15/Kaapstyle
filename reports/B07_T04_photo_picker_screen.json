@@ -1,0 +1,25 @@
+{
+  "job_id": "JOB-B07-FLUTTER-001",
+  "cr_id": "CR01",
+  "uc_id": "UC01",
+  "task_id": "T04",
+  "subtask_ids": ["B07-MOB-ST01"],
+  "priority": "P0",
+  "owner_request": "Implement mobile/lib/features/media/screens/photo_picker_screen.dart concisely (under 220 lines):\n- Import 'package:flutter/material.dart'.\n- StatefulWidget PhotoPickerScreen({super.key, required this.userId, this.onPhotosSelected}).\n- Top bar with photo count badge (e.g. '3 / 10 Selected') and 'Upload' button.\n- Action row: 'Open Camera' icon button and 'Select From Gallery' button.\n- GridView showing selected photo placeholders (or image thumbnails).\n- Tapping an item allows previewing or removing from the batch.\n- Bounded batch notice: 'Select up to 10 garments at a time for optimal quality.'\n- Clean responsive design.",
+  "worker_role": "AGENT_A_FLUTTER",
+  "key_alias": "KEY_A",
+  "model": "claude-sonnet-5-5",
+  "allowed_paths": [
+    "mobile/lib/features/media/screens/photo_picker_screen.dart"
+  ],
+  "forbidden_paths": [
+    "AGENTS.md",
+    "tools/*",
+    "backend/*",
+    "reports/*"
+  ],
+  "context_files": [],
+  "max_task_usd": 1.50,
+  "required_tests": [],
+  "approval_status": "APPROVED"
+}
