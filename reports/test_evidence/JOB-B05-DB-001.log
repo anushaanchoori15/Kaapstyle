@@ -1,0 +1,41 @@
+JOB ID: JOB-B05-DB-001
+MODE: LIVE API CALL
+REQUEST ID: req_011Cg2HLByHsAnNFCQNhLwi7
+MODEL: claude-haiku-5-5
+STOP REASON: end_turn
+IS TRUNCATED: False
+COST USD: 0.005318
+APPLIED FILES:
+  - backend/src/main/resources/db/migration/V5__create_gdpr_export_and_deletion_tables.sql: Successfully written: backend\src\main\resources\db\migration\V5__create_gdpr_export_and_deletion_tables.sql
+
+RAW OUTPUT:
+***FILE: backend/src/main/resources/db/migration/V5__create_gdpr_export_and_deletion_tables.sql***
+```sql
+-- V5: GDPR export and deletion support
+-- Target: MySQL 8.x, InnoDB, utf8mb4
+-- Traceability: CR17 -> UC16 -> T01 (B05-DB-ST01)
+
+-- 1. Soft-delete marker on users
+ALTER TABLE users
+    ADD COLUMN deleted_at TIMESTAMP NULL AFTER updated_at,
+    ADD INDEX idx_users_deleted_at (deleted_at);
+
+-- 2. GDPR data export requests
+CREATE TABLE gdpr_export_requests (
+    id           BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id      BIGINT       NOT NULL,
+    status       VARCHAR(20)  NOT NULL DEFAULT 'PENDING',
+    download_url VARCHAR(500) NULL,
+    expires_at   TIMESTAMP    NULL,
+    created_at   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    completed_at TIMESTAMP    NULL,
+    CONSTRAINT fk_gdpr_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+    INDEX idx_gdpr_user_status (user_id, status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+```
+***END_FILE***
+
+Notes:
+- The `AFTER updated_at` clause assumes `users` already has an `updated_at` column. If it does not, the migration will fail, so verify this against the current schema.
+- `user_id` is `BIGINT` to match `users.id`. A type mismatch would make the foreign key creation fail.
+- `ON DELETE CASCADE` only fires on a hard delete. Because `users` uses soft delete via `deleted_at`, export rows will persist until a hard-delete job runs. The deletion workflow must handle this explicitly.

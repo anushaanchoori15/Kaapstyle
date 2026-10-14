@@ -1,0 +1,242 @@
+JOB ID: JOB-B05-FLUTTER-001
+MODE: LIVE API CALL
+REQUEST ID: req_011Cg2HTh6CHnrE2K7Njzffj
+MODEL: claude-sonnet-5-5
+STOP REASON: end_turn
+IS TRUNCATED: False
+COST USD: 0.042312
+APPLIED FILES:
+  - mobile/lib/features/profile/screens/account_security_screen.dart: Successfully written: mobile\lib\features\profile\screens\account_security_screen.dart
+
+RAW OUTPUT:
+***FILE: mobile/lib/features/profile/screens/account_security_screen.dart***
+import 'dart:convert';
+
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+
+/// Account security screen: GDPR data export and account deletion.
+/// Hierarchy: CR17 -> UC16 -> T04 (B05-MOB-ST01)
+class AccountSecurityScreen extends StatefulWidget {
+  const AccountSecurityScreen({super.key, required this.userId});
+
+  final String userId;
+
+  @override
+  State<AccountSecurityScreen> createState() => _AccountSecurityScreenState();
+}
+
+enum _ExportStatus { idle, pending, completed }
+
+class _AccountSecurityScreenState extends State<AccountSecurityScreen> {
+  static const String _baseUrl = '';
+
+  _ExportStatus _exportStatus = _ExportStatus.idle;
+  String? _downloadUrl;
+  bool _busy = false;
+
+  Future<void> _requestExport() async {
+    setState(() {
+      _busy = true;
+      _exportStatus = _ExportStatus.pending;
+    });
+    try {
+      final res = await http.post(
+        Uri.parse('$_baseUrl/api/account/${widget.userId}/export'),
+      );
+      if (!mounted) return;
+      if (res.statusCode >= 200 && res.statusCode < 300) {
+        final body = res.body.isNotEmpty ? jsonDecode(res.body) : {};
+        final url = body is Map ? body['downloadUrl'] as String? : null;
+        setState(() {
+          _downloadUrl = url;
+          _exportStatus =
+              url != null ? _ExportStatus.completed : _ExportStatus.pending;
+        });
+      } else {
+        setState(() => _exportStatus = _ExportStatus.idle);
+        _snack('Export request failed (${res.statusCode}).');
+      }
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _exportStatus = _ExportStatus.idle);
+      _snack('Network error. Please try again.');
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  Future<void> _confirmDelete() async {
+    final controller = TextEditingController();
+    final password = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delete Account'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+                'This action is permanent. Enter your password to confirm.'),
+            const SizedBox(height: 16),
+            TextField(
+              controller: controller,
+              obscureText: true,
+              decoration: const InputDecoration(
+                labelText: 'Password',
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            onPressed: () => Navigator.of(ctx).pop(controller.text),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+    controller.dispose();
+    if (password == null || password.isEmpty) return;
+    await _deleteAccount(password);
+  }
+
+  Future<void> _deleteAccount(String password) async {
+    setState(() => _busy = true);
+    try {
+      final res = await http.post(
+        Uri.parse('$_baseUrl/api/account/${widget.userId}/delete'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'password': password}),
+      );
+      if (!mounted) return;
+      if (res.statusCode >= 200 && res.statusCode < 300) {
+        _snack('Your account has been deleted.');
+        Navigator.of(context)
+            .pushNamedAndRemoveUntil('/login', (route) => false);
+      } else {
+        _snack('Could not delete account (${res.statusCode}).');
+      }
+    } catch (_) {
+      if (mounted) _snack('Network error. Please try again.');
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  void _snack(String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+  }
+
+  Widget _exportStatusWidget() {
+    switch (_exportStatus) {
+      case _ExportStatus.pending:
+        return const Row(
+          children: [
+            SizedBox(
+              width: 16,
+              height: 16,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+            SizedBox(width: 12),
+            Text('Export pending...'),
+          ],
+        );
+      case _ExportStatus.completed:
+        return Row(
+          children: [
+            const Icon(Icons.check_circle, color: Colors.green, size: 20),
+            const SizedBox(width: 8),
+            Expanded(
+              child: SelectableText(
+                _downloadUrl ?? '',
+                style: const TextStyle(
+                  color: Colors.blue,
+                  decoration: TextDecoration.underline,
+                ),
+              ),
+            ),
+          ],
+        );
+      case _ExportStatus.idle:
+        return const SizedBox.shrink();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Scaffold(
+      appBar: AppBar(title: const Text('Account Security')),
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 600),
+          child: ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Your Data', style: theme.textTheme.titleLarge),
+                      const SizedBox(height: 8),
+                      const Text(
+                          'Request a copy of all personal data we store about you (GDPR).'),
+                      const SizedBox(height: 16),
+                      ElevatedButton.icon(
+                        onPressed: _busy ? null : _requestExport,
+                        icon: const Icon(Icons.download),
+                        label: const Text('Request My Data'),
+                      ),
+                      const SizedBox(height: 12),
+                      _exportStatusWidget(),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  side: const BorderSide(color: Colors.red),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Danger Zone',
+                          style: theme.textTheme.titleLarge
+                              ?.copyWith(color: Colors.red)),
+                      const SizedBox(height: 8),
+                      const Text(
+                          'Deleting your account permanently removes all your data.'),
+                      const SizedBox(height: 16),
+                      ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          foregroundColor: Colors.white,
+                        ),
+                        onPressed: _busy ? null : _confirmDelete,
+                        icon: const Icon(Icons.delete_forever),
+                        label: const Text('Delete Account'),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+***END_FILE***

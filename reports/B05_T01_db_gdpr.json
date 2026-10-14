@@ -1,0 +1,25 @@
+{
+  "job_id": "JOB-B05-DB-001",
+  "cr_id": "CR17",
+  "uc_id": "UC16",
+  "task_id": "T01",
+  "subtask_ids": ["B05-DB-ST01"],
+  "priority": "P0",
+  "owner_request": "Write Flyway migration V5__create_gdpr_export_and_deletion_tables.sql for MySQL with utf8mb4 encoding:\n1. ALTER TABLE users ADD COLUMN deleted_at TIMESTAMP NULL AFTER updated_at, ADD INDEX idx_users_deleted_at (deleted_at);\n2. CREATE TABLE gdpr_export_requests (id BIGINT AUTO_INCREMENT PRIMARY KEY, user_id BIGINT NOT NULL, status VARCHAR(20) NOT NULL DEFAULT 'PENDING', download_url VARCHAR(500) NULL, expires_at TIMESTAMP NULL, created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, completed_at TIMESTAMP NULL, CONSTRAINT fk_gdpr_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE, INDEX idx_gdpr_user_status (user_id, status)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;",
+  "worker_role": "AGENT_C_QA",
+  "key_alias": "KEY_C",
+  "model": "claude-haiku-5-5",
+  "allowed_paths": [
+    "backend/src/main/resources/db/migration/V5__create_gdpr_export_and_deletion_tables.sql"
+  ],
+  "forbidden_paths": [
+    "AGENTS.md",
+    "tools/*",
+    "mobile/*",
+    "reports/*"
+  ],
+  "context_files": [],
+  "max_task_usd": 1.00,
+  "required_tests": [],
+  "approval_status": "APPROVED"
+}
