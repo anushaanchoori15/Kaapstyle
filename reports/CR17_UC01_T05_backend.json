@@ -1,0 +1,36 @@
+{
+  "job_id": "JOB-CR17-UC01-T05-001",
+  "cr_id": "CR17",
+  "uc_id": "UC01",
+  "task_id": "T05",
+  "subtask_ids": ["CR17-UC01-T05-ST01", "CR17-UC01-T05-ST02", "CR17-UC01-T05-ST03"],
+  "priority": "P0",
+  "owner_request": "Implement Spring Boot user registration and authentication endpoints with password hashing, rate throttling protection, and JWT generation.",
+  "worker_role": "AGENT_B_JAVA",
+  "key_alias": "KEY_B",
+  "model": "claude-sonnet-5-5",
+  "allowed_paths": [
+    "backend/src/main/java/com/kaapstyle/auth/dto/RegisterRequest.java",
+    "backend/src/main/java/com/kaapstyle/auth/dto/AuthResponse.java",
+    "backend/src/main/java/com/kaapstyle/auth/controller/AuthController.java",
+    "backend/src/main/java/com/kaapstyle/auth/service/AuthService.java",
+    "backend/src/main/java/com/kaapstyle/auth/repository/UserRepository.java",
+    "backend/src/main/java/com/kaapstyle/auth/model/User.java",
+    "backend/src/test/java/com/kaapstyle/auth/AuthControllerTest.java"
+  ],
+  "forbidden_paths": [
+    "AGENTS.md",
+    "tools/*",
+    "mobile/*",
+    "reports/*"
+  ],
+  "context_files": [
+    "E:/KAAPSTYLE_Notes/02_MODULES/CR17/CR17_Accounts_Privacy_Support.md",
+    "E:/KAAPSTYLE_Notes/03_USE_CASES/CR17/UC01/CR17_UC01_Require_verified_email_or_verified_identity_route_for_risk.md"
+  ],
+  "max_task_usd": 2.00,
+  "required_tests": [
+    "mvn test -Dtest=AuthControllerTest"
+  ],
+  "approval_status": "APPROVED"
+}

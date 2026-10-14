@@ -1,0 +1,262 @@
+JOB ID: JOB-B01-JAVA-002
+MODE: LIVE API CALL
+REQUEST ID: req_011Cg2Dof9CsGNweAcsGafdP
+MODEL: claude-sonnet-5-5
+STOP REASON: max_tokens
+IS TRUNCATED: True
+COST USD: 0.077589
+APPLIED FILES:
+  - backend/src/main/java/com/kaapstyle/auth/service/AuthService.java: REJECTED: File content is truncated (missing ***END_FILE*** delimiter). Token limit exceeded.
+
+RAW OUTPUT:
+Both files are below. The task doesn't allow writing DTO, entity or repository files, so I made `AuthService` self-contained. These items are nested in it:
+
+- `RegisterRequest`, `LoginRequest` and `AuthResponse`
+- `ConflictException`, `UnauthorizedException` and `TooManyAttemptsException`
+- an in-memory user store
+
+Nothing has been compiled or run.
+
+- **Dependencies:** BCrypt comes from `spring-security-crypto`, so `BCryptPasswordEncoder` is used directly without the full security starter. `jakarta.validation` is also required.
+- **Secret and expiry:** `kaapstyle.jwt.secret` must be at least 32 characters. Expiry is set by `kaapstyle.jwt.expiration-ms`, which defaults to 1 hour.
+- **Rate limiting:** it allows 5 failed logins per email in a 15-minute window and then returns 429. The task didn't ask for a 429 handler, but I added one because the limiter needs it.
+- **Timing resistance:** an unknown email still runs a BCrypt check against a pre-computed dummy hash before returning the same 401 as a wrong password.
+
+***FILE: backend/src/main/java/com/kaapstyle/auth/service/AuthService.java***
+package com.kaapstyle.auth.service;
+
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.time.Instant;
+import java.util.Base64;
+import java.util.Locale;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
+/**
+ * Authentication service: registration, login, BCrypt password hashing,
+ * in-memory login attempt tracking and HMAC-SHA256 signed JWT generation.
+ */
+@Service
+public class AuthService {
+
+    private static final String HMAC_ALGORITHM = "HmacSHA256";
+    private static final int MAX_FAILED_ATTEMPTS = 5;
+    private static final long ATTEMPT_WINDOW_MS = 15L * 60L * 1000L;
+    private static final Base64.Encoder B64_URL = Base64.getUrlEncoder().withoutPadding();
+
+    // ---------------------------------------------------------------- DTOs
+
+    public record RegisterRequest(
+            @NotBlank @Email String email,
+            @NotBlank @Size(min = 8, max = 72) String password,
+            @Size(max = 100) String name) {
+    }
+
+    public record LoginRequest(
+            @NotBlank @Email String email,
+            @NotBlank String password) {
+    }
+
+    public record AuthResponse(
+            String token,
+            String tokenType,
+            long expiresIn,
+            String userId,
+            String email,
+            String name) {
+    }
+
+    // ---------------------------------------------------------- Exceptions
+
+    public static class ConflictException extends RuntimeException {
+        public ConflictException(String message) {
+            super(message);
+        }
+    }
+
+    public static class UnauthorizedException extends RuntimeException {
+        public UnauthorizedException(String message) {
+            super(message);
+        }
+    }
+
+    public static class TooManyAttemptsException extends RuntimeException {
+        public TooManyAttemptsException(String message) {
+            super(message);
+        }
+    }
+
+    // --------------------------------------------------------- Internal state
+
+    private record UserRecord(String id, String email, String name, String passwordHash) {
+    }
+
+    private static final class AttemptInfo {
+        private int failures;
+        private long windowStart;
+
+        private AttemptInfo(long now) {
+            this.windowStart = now;
+        }
+    }
+
+    private final ConcurrentMap<String, UserRecord> users = new ConcurrentHashMap<>();
+    private final ConcurrentMap<String, AttemptInfo> attempts = new ConcurrentHashMap<>();
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final String dummyHash;
+    private final byte[] secretKey;
+    private final long expirationMs;
+
+    public AuthService(@Value("${kaapstyle.jwt.secret}") String secret,
+                       @Value("${kaapstyle.jwt.expiration-ms:3600000}") long expirationMs) {
+        if (secret == null || secret.getBytes(StandardCharsets.UTF_8).length < 32) {
+            throw new IllegalStateException("kaapstyle.jwt.secret must be at least 32 bytes long");
+        }
+        if (expirationMs <= 0) {
+            throw new IllegalStateException("kaapstyle.jwt.expiration-ms must be positive");
+        }
+        this.secretKey = secret.getBytes(StandardCharsets.UTF_8);
+        this.expirationMs = expirationMs;
+        // Used to equalise timing when the account does not exist.
+        this.dummyHash = passwordEncoder.encode("kaapstyle-dummy-password");
+    }
+
+    // ------------------------------------------------------------ Public API
+
+    public AuthResponse register(RegisterRequest request) {
+        if (request == null) {
+            throw new IllegalArgumentException("Request body is required");
+        }
+        String email = normalizeEmail(request.email());
+        String password = request.password();
+        if (password == null || password.length() < 8) {
+            throw new IllegalArgumentException("Password must be at least 8 characters");
+        }
+        String name = request.name() == null ? "" : request.name().trim();
+
+        UserRecord user = new UserRecord(
+                UUID.randomUUID().toString(), email, name, passwordEncoder.encode(password));
+        if (users.putIfAbsent(email, user) != null) {
+            throw new ConflictException("Email already registered");
+        }
+        return buildResponse(user);
+    }
+
+    public AuthResponse login(LoginRequest request) {
+        if (request == null) {
+            throw new IllegalArgumentException("Request body is required");
+        }
+        String email = normalizeEmail(request.email());
+        String password = request.password();
+        if (password == null || password.isEmpty()) {
+            throw new IllegalArgumentException("Password is required");
+        }
+
+        checkRateLimit(email);
+
+        UserRecord user = users.get(email);
+        if (user == null) {
+            // Dummy comparison to resist user-enumeration via timing.
+            passwordEncoder.matches(password, dummyHash);
+            recordFailure(email);
+            throw new UnauthorizedException("Invalid email or password");
+        }
+        if (!passwordEncoder.matches(password, user.passwordHash())) {
+            recordFailure(email);
+            throw new UnauthorizedException("Invalid email or password");
+        }
+
+        attempts.remove(email);
+        return buildResponse(user);
+    }
+
+    // --------------------------------------------------------------- Helpers
+
+    private String normalizeEmail(String email) {
+        if (email == null || email.isBlank()) {
+            throw new IllegalArgumentException("Email is required");
+        }
+        return email.trim().toLowerCase(Locale.ROOT);
+    }
+
+    private void checkRateLimit(String email) {
+        AttemptInfo info = attempts.get(email);
+        if (info == null) {
+            return;
+        }
+        long now = System.currentTimeMillis();
+        synchronized (info) {
+            if (now - info.windowStart > ATTEMPT_WINDOW_MS) {
+                attempts.remove(email, info);
+                return;
+            }
+            if (info.failures >= MAX_FAILED_ATTEMPTS) {
+                throw new TooManyAttemptsException("Too many failed attempts. Try again later.");
+            }
+        }
+    }
+
+    private void recordFailure(String email) {
+        long now = System.currentTimeMillis();
+        AttemptInfo info = attempts.computeIfAbsent(email, k -> new AttemptInfo(now));
+        synchronized (info) {
+            if (now - info.windowStart > ATTEMPT_WINDOW_MS) {
+                info.windowStart = now;
+                info.failures = 0;
+            }
+            info.failures++;
+        }
+    }
+
+    private AuthResponse buildResponse(UserRecord user) {
+        String token = generateToken(user);
+        return new AuthResponse(token, "Bearer", expirationMs / 1000L,
+                user.id(), user.email(), user.name());
+    }
+
+    private String generateToken(UserRecord user) {
+        long issuedAt = Instant.now().getEpochSecond();
+        long expiresAt = issuedAt + (expirationMs / 1000L);
+
+        String header = "{\"alg\":\"HS256\",\"typ\":\"JWT\"}";
+        String payload = "{\"sub\":\"" + escapeJson(user.id()) + "\","
+                + "\"email\":\"" + escapeJson(user.email()) + "\","
+                + "\"iat\":" + issuedAt + ","
+                + "\"exp\":" + expiresAt + "}";
+
+        String signingInput = B64_URL.encodeToString(header.getBytes(StandardCharsets.UTF_8))
+                + "." + B64_URL.encodeToString(payload.getBytes(StandardCharsets.UTF_8));
+        return signingInput + "." + B64_URL.encodeToString(hmacSha256(signingInput));
+    }
+
+    private byte[] hmacSha256(String data) {
+        try {
+            Mac mac = Mac.getInstance(HMAC_ALGORITHM);
+            mac.init(new SecretKeySpec(secretKey, HMAC_ALGORITHM));
+            return mac.doFinal(data.getBytes(StandardCharsets.UTF_8));
+        } catch (NoSuchAlgorithmException | InvalidKeyException e) {
+            throw new IllegalStateException("Unable to sign JWT", e);
+        }
+    }
+
+    private static String escapeJson(String value) {
+        StringBuilder sb = new StringBuilder(value.length() + 8);
+        for (char c : value.toCharArray()) {
+            switch (c) {
+                case '"' -> sb.append("\\\"");
+                case '\\' -> sb.append("\\\\");
+                case '\n' -> sb.append("\\n");
+                case '\r' -> sb.append("\\r");
+                case '\t' ->

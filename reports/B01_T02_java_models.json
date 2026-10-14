@@ -1,0 +1,32 @@
+{
+  "job_id": "JOB-B01-JAVA-001",
+  "cr_id": "CR17",
+  "uc_id": "UC01",
+  "task_id": "T02",
+  "subtask_ids": ["B01-JAVA-ST01", "B01-JAVA-ST02"],
+  "priority": "P0",
+  "owner_request": "Implement the core auth models and DTOs in Spring Boot 3 (Jakarta Persistence):\n1. backend/src/main/java/com/kaapstyle/auth/dto/RegisterRequest.java (record or class with email, password, firstName, lastName, Jakarta @NotBlank, @Email, @Size)\n2. backend/src/main/java/com/kaapstyle/auth/dto/LoginRequest.java (record or class with email, password, Jakarta validation)\n3. backend/src/main/java/com/kaapstyle/auth/dto/AuthResponse.java (record or class with accessToken, tokenType, email, userId)\n4. backend/src/main/java/com/kaapstyle/auth/model/User.java (Jakarta entity mapping to 'users' table matching V1 schema: id, email, passwordHash, firstName, lastName, isVerified, createdAt, updatedAt)\n5. backend/src/main/java/com/kaapstyle/auth/repository/UserRepository.java (Spring Data JpaRepository<User, Long> with Optional<User> findByEmail(String email), boolean existsByEmail(String email))",
+  "worker_role": "AGENT_B_JAVA",
+  "key_alias": "KEY_B",
+  "model": "claude-sonnet-5-5",
+  "allowed_paths": [
+    "backend/src/main/java/com/kaapstyle/auth/dto/RegisterRequest.java",
+    "backend/src/main/java/com/kaapstyle/auth/dto/LoginRequest.java",
+    "backend/src/main/java/com/kaapstyle/auth/dto/AuthResponse.java",
+    "backend/src/main/java/com/kaapstyle/auth/model/User.java",
+    "backend/src/main/java/com/kaapstyle/auth/repository/UserRepository.java"
+  ],
+  "forbidden_paths": [
+    "AGENTS.md",
+    "tools/*",
+    "mobile/*",
+    "reports/*"
+  ],
+  "context_files": [
+    "E:/KAAPSTYLE_Notes/02_MODULES/CR17/CR17_Accounts_Privacy_Support.md",
+    "E:/KAAPSTYLE_Notes/03_USE_CASES/CR17/UC01/CR17_UC01_Require_verified_email_or_verified_identity_route_for_risk.md"
+  ],
+  "max_task_usd": 2.00,
+  "required_tests": [],
+  "approval_status": "APPROVED"
+}

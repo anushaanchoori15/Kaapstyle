@@ -1,0 +1,25 @@
+{
+  "job_id": "JOB-B01-JAVA-002A",
+  "cr_id": "CR17",
+  "uc_id": "UC01",
+  "task_id": "T03",
+  "subtask_ids": ["B01-JAVA-ST03"],
+  "priority": "P0",
+  "owner_request": "Implement backend/src/main/java/com/kaapstyle/auth/service/AuthService.java only.\nIMPORTANT: Existing classes already exist and MUST be imported, DO NOT redefine them:\n- import com.kaapstyle.auth.dto.RegisterRequest;\n- import com.kaapstyle.auth.dto.LoginRequest;\n- import com.kaapstyle.auth.dto.AuthResponse;\n- import com.kaapstyle.auth.model.User;\n- import com.kaapstyle.auth.repository.UserRepository;\n\nImplement concise, clean methods:\n- Autowire UserRepository and password hashing (BCryptPasswordEncoder or standard SHA-256 with salt).\n- register(RegisterRequest req): validates email does not exist via userRepository.existsByEmail (throws ResponseStatusException(HttpStatus.CONFLICT) if exists), saves new User entity, generates token string, returns AuthResponse.\n- login(LoginRequest req): finds user by email, verifies password (throws ResponseStatusException(HttpStatus.UNAUTHORIZED) if invalid), returns AuthResponse.\n- generateToken(User user): returns signed JWT or secure Bearer token string.",
+  "worker_role": "AGENT_B_JAVA",
+  "key_alias": "KEY_B",
+  "model": "claude-sonnet-5-5",
+  "allowed_paths": [
+    "backend/src/main/java/com/kaapstyle/auth/service/AuthService.java"
+  ],
+  "forbidden_paths": [
+    "AGENTS.md",
+    "tools/*",
+    "mobile/*",
+    "reports/*"
+  ],
+  "context_files": [],
+  "max_task_usd": 1.50,
+  "required_tests": [],
+  "approval_status": "APPROVED"
+}

@@ -1,0 +1,20 @@
+{
+  "job_id": "JOB-CR17-UC01-T04-001",
+  "cr_id": "CR17",
+  "uc_id": "UC01",
+  "task_id": "T04",
+  "all_passed": false,
+  "timestamp": "2026-10-14T03:58:58.398054+00:00",
+  "results": [
+    {
+      "tc_id": "TC-CR17-UC01-T04-01",
+      "linked_hierarchy": "CR17 -> UC01 -> T04 -> ['CR17-UC01-T04-ST01', 'CR17-UC01-T04-ST02', 'CR17-UC01-T04-ST03']",
+      "type": "AUTOMATED_UNIT_TEST",
+      "command": "flutter test test/features/auth/auth_screen_test.dart",
+      "environment": "Python 3.12.10 / Windows",
+      "execution_date": "2026-10-14T03:58:58.395548+00:00",
+      "status": "FAIL",
+      "output_summary": "00:00 +0: loading E:/KAAPSTYLE/mobile/test/features/auth/auth_screen_test.dart\n00:00 +0 -1: loading E:/KAAPSTYLE/mobile/test/features/auth/auth_screen_test.dart [E]\n  Failed to load \"E:/KAAPSTYLE/mobile/test/features/auth/auth_screen_test.dart\": Does not exist.\n00:00 +0 -1: Some tests failed.\n\nFailing tests:\n  E:/KAAPSTYLE/mobile/test/features/auth/auth_screen_test.dart: loading E:/KAAPSTYLE/mobile/test/features/auth/auth_screen_test.dart"
+    }
+  ]
+}

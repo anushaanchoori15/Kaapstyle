@@ -1,0 +1,14 @@
+{
+  "job_id": "JOB-DRYRUN-CR01-UC01-T01",
+  "cr_id": "CR01",
+  "uc_id": "UC01",
+  "task_id": "T01",
+  "subtask_ids": ["ST01"],
+  "worker_role": "AGENT_A_FLUTTER",
+  "key_alias": "KEY_A",
+  "model": "claude-3-5-sonnet-20241022",
+  "owner_request": "Dry-run verification of auth state widget",
+  "allowed_paths": ["mobile/lib/features/auth/auth_widget.dart"],
+  "forbidden_paths": ["backend/*", "AGENTS.md"],
+  "max_task_usd": 1.50
+}

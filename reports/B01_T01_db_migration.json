@@ -1,0 +1,28 @@
+{
+  "job_id": "JOB-B01-DB-001",
+  "cr_id": "CR17",
+  "uc_id": "UC01",
+  "task_id": "T01",
+  "subtask_ids": ["B01-DB-ST01"],
+  "priority": "P0",
+  "owner_request": "Write Flyway migration V1__create_users_table.sql for MySQL with utf8mb4 encoding, id BIGINT AUTO_INCREMENT PRIMARY KEY, email VARCHAR(255) NOT NULL UNIQUE, password_hash VARCHAR(255) NOT NULL, first_name VARCHAR(100), last_name VARCHAR(100), is_verified BOOLEAN NOT NULL DEFAULT FALSE, created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, and explicit index idx_users_email (email).",
+  "worker_role": "AGENT_C_QA",
+  "key_alias": "KEY_C",
+  "model": "claude-haiku-5-5",
+  "allowed_paths": [
+    "backend/src/main/resources/db/migration/V1__create_users_table.sql"
+  ],
+  "forbidden_paths": [
+    "AGENTS.md",
+    "tools/*",
+    "mobile/*",
+    "reports/*"
+  ],
+  "context_files": [
+    "E:/KAAPSTYLE_Notes/02_MODULES/CR17/CR17_Accounts_Privacy_Support.md",
+    "E:/KAAPSTYLE_Notes/03_USE_CASES/CR17/UC01/CR17_UC01_Require_verified_email_or_verified_identity_route_for_risk.md"
+  ],
+  "max_task_usd": 1.00,
+  "required_tests": [],
+  "approval_status": "APPROVED"
+}

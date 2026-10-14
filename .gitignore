@@ -1,0 +1,61 @@
+# ==========================================
+# KAAPSTYLE — Git Ignore Configuration
+# ==========================================
+
+# --- Secrets, Credentials & Local Environment ---
+.env
+*.env
+*.env.*
+*.key
+*.pem
+*secret*
+*credential*
+credentials.json
+
+# --- API Coordinator Operational Files ---
+__pycache__/
+*.py[cod]
+*$py.class
+reports/reservations.json
+reports/pause.lock
+
+# --- Flutter / Dart ---
+mobile/.dart_tool/
+mobile/build/
+mobile/.packages
+mobile/.flutter-plugins
+mobile/.flutter-plugins-dependencies
+mobile/ios/Pods/
+mobile/ios/.symlinks/
+mobile/ios/Flutter/Flutter.framework
+mobile/ios/Flutter/Flutter.podspec
+mobile/ios/Flutter/Generated.xcconfig
+mobile/ios/Flutter/app.framework
+mobile/android/.gradle/
+mobile/android/local.properties
+mobile/android/app/build/
+mobile/android/captures/
+mobile/android/gradlew
+mobile/android/gradlew.bat
+
+# --- Java / Maven / Spring Boot ---
+backend/target/
+backend/*.log
+backend/.mvn/wrapper/maven-wrapper.jar
+
+# --- IDEs & Editors ---
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+.project
+.classpath
+.settings/
+
+# --- Operating System Files ---
+.DS_Store
+Thumbs.db
+Desktop.ini
+ehthumbs.db
+$RECYCLE.BIN/

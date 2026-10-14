@@ -1,0 +1,33 @@
+{
+  "job_id": "JOB-CR17-UC01-T04-001",
+  "cr_id": "CR17",
+  "uc_id": "UC01",
+  "task_id": "T04",
+  "subtask_ids": ["CR17-UC01-T04-ST01", "CR17-UC01-T04-ST02", "CR17-UC01-T04-ST03"],
+  "priority": "P0",
+  "owner_request": "Implement Flutter authentication screens (Login and Registration) with form validation, email verification prompt, and accessible high-contrast UI controls.",
+  "worker_role": "AGENT_A_FLUTTER",
+  "key_alias": "KEY_A",
+  "model": "claude-sonnet-5-5",
+  "allowed_paths": [
+    "mobile/lib/features/auth/presentation/login_screen.dart",
+    "mobile/lib/features/auth/presentation/register_screen.dart",
+    "mobile/lib/features/auth/data/auth_service.dart",
+    "mobile/test/features/auth/auth_screen_test.dart"
+  ],
+  "forbidden_paths": [
+    "AGENTS.md",
+    "tools/*",
+    "backend/*",
+    "reports/*"
+  ],
+  "context_files": [
+    "E:/KAAPSTYLE_Notes/02_MODULES/CR17/CR17_Accounts_Privacy_Support.md",
+    "E:/KAAPSTYLE_Notes/03_USE_CASES/CR17/UC01/CR17_UC01_Require_verified_email_or_verified_identity_route_for_risk.md"
+  ],
+  "max_task_usd": 2.00,
+  "required_tests": [
+    "flutter test test/features/auth/auth_screen_test.dart"
+  ],
+  "approval_status": "APPROVED"
+}

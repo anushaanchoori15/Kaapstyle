@@ -1,0 +1,11 @@
+JOB ID: JOB-CR17-UC01-T04-001
+MODE: DRY-RUN SIMULATION (0 cost, no network)
+REQUEST ID: dryrun_mock_req_1791949606181
+MODEL: claude-sonnet-5-5
+STOP REASON: end_turn
+IS TRUNCATED: False
+COST USD: 0.000000
+APPLIED FILES:
+
+RAW OUTPUT:
+/* [DRY-RUN SIMULATION] Model 'claude-sonnet-5-5' validated. No changes applied. */

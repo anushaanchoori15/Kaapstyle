@@ -1,0 +1,6 @@
+JOB ID: JOB-DRYRUN-CR01-UC01-T01
+MODE: DRY-RUN SIMULATION (0 cost, no network)
+REQUEST ID: dryrun_mock_req_1791947018745
+MODEL: claude-3-5-sonnet-20241022
+OUTPUT SNIPPET:
+/* [DRY-RUN SIMULATION] Model 'claude-3-5-sonnet-20241022' validated. No changes applied. */

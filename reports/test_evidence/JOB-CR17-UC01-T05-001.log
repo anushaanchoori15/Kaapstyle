@@ -1,0 +1,42 @@
+JOB ID: JOB-CR17-UC01-T05-001
+MODE: LIVE API CALL
+REQUEST ID: req_011Cg1REsdGXifnbtYSFCv7d
+MODEL: claude-sonnet-5-5
+COST USD: 0.055335
+APPLIED FILES:
+
+RAW OUTPUT:
+Both endpoints are implemented within the allowed files only: `POST /api/auth/register` and `POST /api/auth/login`. I have not compiled or run any of this, including the tests.
+
+- **Password hashing:** BCrypt, with a dummy-hash comparison on unknown emails to reduce timing differences.
+- **Rate throttling:** an in-memory sliding window in `AuthService`. Registration is limited to 10 attempts per hour per client IP, and login to 5 failures per 15 minutes per IP and email. Over the limit returns `429`.
+- **JWT:** HS256, built with `javax.crypto` HMAC and Jackson, so no new dependency is needed.
+- **Login request:** `LoginRequest` is a nested record in `AuthController`, because no separate login DTO file is in the allowed paths.
+
+Assumptions and requirements:
+- The stack is Spring Boot 3 (`jakarta.*`) with `spring-security-crypto` on the classpath.
+- `kaapstyle.jwt.secret` (at least 32 bytes) must be set in the application configuration, which is outside my allowed paths. The service fails at startup if it is missing or too short. `kaapstyle.jwt.expiration-seconds` is optional and defaults to 3600.
+- Nothing in these files permits unauthenticated access to `/api/auth/**`, so if Spring Security's default filter chain is active, it needs a permit rule for that path in a config file outside my allowed paths.
+
+***FILE: backend/src/main/java/com/kaapstyle/auth/model/User.java***
+```java
+package com.kaapstyle.auth.model;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+import java.time.Instant;
+
+/**
+ * Persistent user account. Only the BCrypt hash of the password is stored.
+ */
+@Entity
+@Table(name = "users")
+public class User {
+
+    @Id
+    @GeneratedValue(
