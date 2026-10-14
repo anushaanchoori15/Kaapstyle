@@ -1,0 +1,25 @@
+{
+  "job_id": "JOB-B24-DB-001",
+  "cr_id": "CR07",
+  "uc_id": "UC05",
+  "task_id": "T01",
+  "subtask_ids": ["B24-DB-ST01"],
+  "priority": "P0",
+  "owner_request": "Write Flyway migration V24__create_kids_growth_tracking_tables.sql for MySQL with utf8mb4 encoding:\nCREATE TABLE kids_growth_logs (\n  id BIGINT AUTO_INCREMENT PRIMARY KEY,\n  kid_id BIGINT NOT NULL,\n  height_cm DECIMAL(5,2) NOT NULL,\n  weight_kg DECIMAL(5,2) NULL,\n  shoe_size VARCHAR(10) NULL,\n  clothing_size_tag VARCHAR(20) NULL,\n  recorded_at DATE NOT NULL,\n  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  CONSTRAINT fk_growth_kid FOREIGN KEY (kid_id) REFERENCES kids_profiles(id) ON DELETE CASCADE,\n  INDEX idx_growth_kid_date (kid_id, recorded_at)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;",
+  "worker_role": "AGENT_C_QA",
+  "key_alias": "KEY_C",
+  "model": "claude-haiku-5-5",
+  "allowed_paths": [
+    "backend/src/main/resources/db/migration/V24__create_kids_growth_tracking_tables.sql"
+  ],
+  "forbidden_paths": [
+    "AGENTS.md",
+    "tools/*",
+    "mobile/*",
+    "reports/*"
+  ],
+  "context_files": [],
+  "max_task_usd": 1.00,
+  "required_tests": [],
+  "approval_status": "APPROVED"
+}
