@@ -1,0 +1,26 @@
+{
+  "job_id": "JOB-B02-FLUTTER-001",
+  "cr_id": "CR17",
+  "uc_id": "UC05",
+  "task_id": "T04",
+  "subtask_ids": ["B02-MOB-ST01", "B02-MOB-ST02"],
+  "priority": "P0",
+  "owner_request": "Implement Flutter biometric auth service and MFA verification UI screen:\n1. mobile/lib/features/auth/services/biometric_service.dart:\n   - Class BiometricService: checks if local biometrics (FaceID/Fingerprint) are supported/enrolled, authenticates with localizedReason string, handles fallback.\n2. mobile/lib/features/auth/screens/mfa_verify_screen.dart:\n   - StatefulWidget MfaVerifyScreen with 6-digit PIN input fields (or pin controller).\n   - Auto-submit when 6 digits are entered.\n   - Countdown timer for 30s TOTP refresh window.\n   - 'Verify' button with loading indicator.\n   - Biometric prompt button (if enabled).\n   - Friendly error handling on invalid code.",
+  "worker_role": "AGENT_A_FLUTTER",
+  "key_alias": "KEY_A",
+  "model": "claude-sonnet-5-5",
+  "allowed_paths": [
+    "mobile/lib/features/auth/services/biometric_service.dart",
+    "mobile/lib/features/auth/screens/mfa_verify_screen.dart"
+  ],
+  "forbidden_paths": [
+    "AGENTS.md",
+    "tools/*",
+    "backend/*",
+    "reports/*"
+  ],
+  "context_files": [],
+  "max_task_usd": 2.00,
+  "required_tests": [],
+  "approval_status": "APPROVED"
+}

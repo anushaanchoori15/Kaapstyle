@@ -1,0 +1,25 @@
+{
+  "job_id": "JOB-B02-FLUTTER-001B",
+  "cr_id": "CR17",
+  "uc_id": "UC05",
+  "task_id": "T04",
+  "subtask_ids": ["B02-MOB-ST02"],
+  "priority": "P0",
+  "owner_request": "Implement Flutter MFA verification UI in mobile/lib/features/auth/screens/mfa_verify_screen.dart only.\n- StatefulWidget MfaVerifyScreen(final Long userId or String userId, final VoidCallback? onVerified).\n- Form with 6-digit text input (TextEditingController, numeric keyboard, maxLength: 6).\n- 'Verify Code' button with loading spinner.\n- Displays helper text: 'Enter the 6-digit code from your authenticator app'.\n- Calls /api/auth/mfa/verify via http POST.\n- SnackBar on invalid code, calls onVerified on success.",
+  "worker_role": "AGENT_A_FLUTTER",
+  "key_alias": "KEY_A",
+  "model": "claude-sonnet-5-5",
+  "allowed_paths": [
+    "mobile/lib/features/auth/screens/mfa_verify_screen.dart"
+  ],
+  "forbidden_paths": [
+    "AGENTS.md",
+    "tools/*",
+    "backend/*",
+    "reports/*"
+  ],
+  "context_files": [],
+  "max_task_usd": 1.50,
+  "required_tests": [],
+  "approval_status": "APPROVED"
+}

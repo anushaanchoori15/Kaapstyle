@@ -1,0 +1,28 @@
+{
+  "job_id": "JOB-B02-JAVA-001",
+  "cr_id": "CR17",
+  "uc_id": "UC05",
+  "task_id": "T02",
+  "subtask_ids": ["B02-JAVA-ST01", "B02-JAVA-ST02"],
+  "priority": "P0",
+  "owner_request": "Implement Spring Boot 3 / Jakarta entities and Spring Data repositories matching V2 schema:\n1. backend/src/main/java/com/kaapstyle/auth/model/RefreshToken.java:\n   - @Entity @Table(name = 'user_refresh_tokens')\n   - Long id, Long userId, String tokenHash, String deviceInfo, Instant expiresAt, boolean isRevoked, Instant createdAt.\n2. backend/src/main/java/com/kaapstyle/auth/repository/RefreshTokenRepository.java:\n   - JpaRepository<RefreshToken, Long>\n   - Optional<RefreshToken> findByTokenHash(String tokenHash)\n   - List<RefreshToken> findByUserIdAndIsRevokedFalse(Long userId)\n3. backend/src/main/java/com/kaapstyle/auth/model/TotpSecret.java:\n   - @Entity @Table(name = 'user_totp_secrets')\n   - Long userId (@Id), String secretKey, boolean isEnabled, String backupCodes, Instant createdAt, Instant updatedAt.\n4. backend/src/main/java/com/kaapstyle/auth/repository/TotpSecretRepository.java:\n   - JpaRepository<TotpSecret, Long>\n   - Optional<TotpSecret> findByUserId(Long userId)",
+  "worker_role": "AGENT_B_JAVA",
+  "key_alias": "KEY_B",
+  "model": "claude-sonnet-5-5",
+  "allowed_paths": [
+    "backend/src/main/java/com/kaapstyle/auth/model/RefreshToken.java",
+    "backend/src/main/java/com/kaapstyle/auth/repository/RefreshTokenRepository.java",
+    "backend/src/main/java/com/kaapstyle/auth/model/TotpSecret.java",
+    "backend/src/main/java/com/kaapstyle/auth/repository/TotpSecretRepository.java"
+  ],
+  "forbidden_paths": [
+    "AGENTS.md",
+    "tools/*",
+    "mobile/*",
+    "reports/*"
+  ],
+  "context_files": [],
+  "max_task_usd": 2.00,
+  "required_tests": [],
+  "approval_status": "APPROVED"
+}

@@ -1,0 +1,241 @@
+JOB ID: JOB-B02-JAVA-002
+MODE: LIVE API CALL
+REQUEST ID: req_011Cg2F48i9tbzAfQA3We2Cm
+MODEL: claude-sonnet-5-5
+STOP REASON: max_tokens
+IS TRUNCATED: True
+COST USD: 0.077475
+APPLIED FILES:
+  - backend/src/main/java/com/kaapstyle/auth/service/MfaService.java: REJECTED: File content is truncated (missing ***END_FILE*** delimiter). Token limit exceeded.
+
+RAW OUTPUT:
+I only wrote the two allowed files. Both depend on classes in other paths that I couldn't see, so I assumed their shapes:
+
+- **Entities:** `TotpSecret` (`userId`, `secret`, `enabled`), `RefreshToken` (`userId`, `tokenHash`, `expiresAt` as `Instant`, `revoked`) and `User` (`getId()`, `getEmail()`, `setMfaEnabled(boolean)`), all in `com.kaapstyle.auth.entity`.
+- **Repositories:** `TotpSecretRepository.findByUserId(Long)`, `RefreshTokenRepository.findByTokenHash(String)`, and `UserRepository` extending `JpaRepository<User, Long>`, all in `com.kaapstyle.auth.repository`.
+- **JWT:** I didn't know of an existing JWT service, so `MfaService` signs HS256 access tokens itself. It reads `kaapstyle.jwt.secret` and optionally `kaapstyle.jwt.access-token-ttl-seconds` and `kaapstyle.jwt.refresh-token-ttl-seconds`.
+- **Refresh tokens:** only the SHA-256 hash of the raw token is stored.
+
+If the entity or repository names differ from the above, the calls in `MfaService` need adjusting.
+
+***FILE: backend/src/main/java/com/kaapstyle/auth/service/MfaService.java***
+```java
+package com.kaapstyle.auth.service;
+
+import com.kaapstyle.auth.entity.RefreshToken;
+import com.kaapstyle.auth.entity.TotpSecret;
+import com.kaapstyle.auth.entity.User;
+import com.kaapstyle.auth.repository.RefreshTokenRepository;
+import com.kaapstyle.auth.repository.TotpSecretRepository;
+import com.kaapstyle.auth.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import java.net.URLEncoder;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import java.security.GeneralSecurityException;
+import java.security.MessageDigest;
+import java.security.SecureRandom;
+import java.time.Instant;
+import java.util.Base64;
+
+@Service
+public class MfaService {
+
+    private static final String ISSUER = "KAAPSTYLE";
+    private static final String BASE32_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+    private static final int SECRET_BYTES = 20;
+    private static final int TIME_STEP_SECONDS = 30;
+    private static final int CODE_DIGITS = 6;
+    private static final int ALLOWED_DRIFT_STEPS = 1;
+
+    private final SecureRandom secureRandom = new SecureRandom();
+
+    private final TotpSecretRepository totpSecretRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final UserRepository userRepository;
+
+    @Value("${kaapstyle.jwt.secret}")
+    private String jwtSecret;
+
+    @Value("${kaapstyle.jwt.access-token-ttl-seconds:900}")
+    private long accessTokenTtlSeconds;
+
+    @Value("${kaapstyle.jwt.refresh-token-ttl-seconds:1209600}")
+    private long refreshTokenTtlSeconds;
+
+    @Autowired
+    public MfaService(TotpSecretRepository totpSecretRepository,
+                      RefreshTokenRepository refreshTokenRepository,
+                      UserRepository userRepository) {
+        this.totpSecretRepository = totpSecretRepository;
+        this.refreshTokenRepository = refreshTokenRepository;
+        this.userRepository = userRepository;
+    }
+
+    public record TotpSetup(String secret, String otpauthUri) {}
+
+    public record TokenPair(String accessToken, String refreshToken) {}
+
+    // ------------------------------------------------------------------
+    // TOTP setup
+    // ------------------------------------------------------------------
+
+    @Transactional
+    public TotpSetup generateTotpSecret(Long userId) {
+        User user = findUser(userId);
+
+        TotpSecret entity = totpSecretRepository.findByUserId(userId).orElse(null);
+        if (entity != null && entity.isEnabled()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "MFA is already enabled");
+        }
+        if (entity == null) {
+            entity = new TotpSecret();
+            entity.setUserId(userId);
+        }
+
+        byte[] raw = new byte[SECRET_BYTES];
+        secureRandom.nextBytes(raw);
+        String secret = base32Encode(raw);
+
+        entity.setSecret(secret);
+        entity.setEnabled(false);
+        totpSecretRepository.save(entity);
+
+        String label = urlEncode(ISSUER + ":" + user.getEmail());
+        String uri = "otpauth://totp/" + label
+                + "?secret=" + secret
+                + "&issuer=" + urlEncode(ISSUER)
+                + "&algorithm=SHA1&digits=" + CODE_DIGITS
+                + "&period=" + TIME_STEP_SECONDS;
+
+        return new TotpSetup(secret, uri);
+    }
+
+    // ------------------------------------------------------------------
+    // TOTP verification
+    // ------------------------------------------------------------------
+
+    @Transactional
+    public boolean verifyTotpCode(Long userId, String code) {
+        if (code == null || !code.matches("\\d{" + CODE_DIGITS + "}")) {
+            return false;
+        }
+
+        TotpSecret entity = totpSecretRepository.findByUserId(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "TOTP secret not found"));
+
+        byte[] key = base32Decode(entity.getSecret());
+        long currentStep = Instant.now().getEpochSecond() / TIME_STEP_SECONDS;
+
+        boolean valid = false;
+        for (int i = -ALLOWED_DRIFT_STEPS; i <= ALLOWED_DRIFT_STEPS; i++) {
+            String expected = generateCode(key, currentStep + i);
+            if (MessageDigest.isEqual(
+                    expected.getBytes(StandardCharsets.UTF_8),
+                    code.getBytes(StandardCharsets.UTF_8))) {
+                valid = true;
+            }
+        }
+
+        if (valid && !entity.isEnabled()) {
+            entity.setEnabled(true);
+            totpSecretRepository.save(entity);
+            User user = findUser(userId);
+            user.setMfaEnabled(true);
+            userRepository.save(user);
+        }
+        return valid;
+    }
+
+    // ------------------------------------------------------------------
+    // Refresh token rotation
+    // ------------------------------------------------------------------
+
+    @Transactional
+    public TokenPair rotateRefreshToken(String rawRefreshToken) {
+        if (rawRefreshToken == null || rawRefreshToken.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid refresh token");
+        }
+
+        RefreshToken existing = refreshTokenRepository.findByTokenHash(sha256Hex(rawRefreshToken))
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid refresh token"));
+
+        if (existing.isRevoked()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Refresh token revoked");
+        }
+        if (existing.getExpiresAt() == null || existing.getExpiresAt().isBefore(Instant.now())) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Refresh token expired");
+        }
+
+        existing.setRevoked(true);
+        refreshTokenRepository.save(existing);
+
+        Long userId = existing.getUserId();
+        findUser(userId);
+
+        String newRaw = generateRawRefreshToken();
+        RefreshToken replacement = new RefreshToken();
+        replacement.setUserId(userId);
+        replacement.setTokenHash(sha256Hex(newRaw));
+        replacement.setExpiresAt(Instant.now().plusSeconds(refreshTokenTtlSeconds));
+        replacement.setRevoked(false);
+        refreshTokenRepository.save(replacement);
+
+        return new TokenPair(generateAccessToken(userId), newRaw);
+    }
+
+    // ------------------------------------------------------------------
+    // Helpers
+    // ------------------------------------------------------------------
+
+    private User findUser(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+    }
+
+    /** RFC 6238 / RFC 4226 HMAC-SHA1 dynamic truncation. */
+    private String generateCode(byte[] key, long step) {
+        try {
+            byte[] msg = ByteBuffer.allocate(8).putLong(step).array();
+            Mac mac = Mac.getInstance("HmacSHA1");
+            mac.init(new SecretKeySpec(key, "HmacSHA1"));
+            byte[] hash = mac.doFinal(msg);
+
+            int offset = hash[hash.length - 1] & 0x0F;
+            int binary = ((hash[offset] & 0x7F) << 24)
+                    | ((hash[offset + 1] & 0xFF) << 16)
+                    | ((hash[offset + 2] & 0xFF) << 8)
+                    | (hash[offset + 3] & 0xFF);
+            int otp = binary % (int) Math.pow(10, CODE_DIGITS);
+            return String.format("%0" + CODE_DIGITS + "d", otp);
+        } catch (GeneralSecurityException e) {
+            throw new IllegalStateException("Unable to compute TOTP", e);
+        }
+    }
+
+    private String generateRawRefreshToken() {
+        byte[] bytes = new byte[48];
+        secureRandom.nextBytes(bytes);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
+    }
+
+    private String generateAccessToken(Long userId) {
+        long now = Instant.now().getEpochSecond();
+        String header = "{\"alg\":\"HS256\",\"typ\":\"JWT\"}";
+        String payload = "{\"sub\":\"" + userId + "\",\"iss\":\"" + ISSUER
+                + "\",\"iat\":" + now + ",\"exp\":" + (now + accessTokenTtlSeconds) + "}";
+
+        Base64.Encoder enc = Base64.getUrlEncoder().withoutPadding();
+        String signingInput = enc.encodeToString(header.getBytes(StandardCharsets.UTF_8))
+                + "." + enc.encodeToString(payload.getBytes(StandardCharsets.UTF_8));
+
+        try {
+            Mac mac = Mac.getInstance("HmacSH

@@ -1,0 +1,352 @@
+JOB ID: JOB-B02-FLUTTER-001
+MODE: LIVE API CALL
+REQUEST ID: req_011Cg2FDRbQiwCSQUDnhkHXZ
+MODEL: claude-sonnet-5-5
+STOP REASON: max_tokens
+IS TRUNCATED: True
+COST USD: 0.076863
+APPLIED FILES:
+  - mobile/lib/features/auth/services/biometric_service.dart: Successfully written: mobile\lib\features\auth\services\biometric_service.dart
+  - mobile/lib/features/auth/screens/mfa_verify_screen.dart: REJECTED: File content is truncated (missing ***END_FILE*** delimiter). Token limit exceeded.
+
+RAW OUTPUT:
+***FILE: mobile/lib/features/auth/services/biometric_service.dart***
+```dart
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
+import 'package:local_auth/local_auth.dart';
+
+/// Outcome of a biometric capability check.
+enum BiometricAvailability {
+  /// Hardware present and at least one biometric enrolled.
+  available,
+
+  /// Device has no supported biometric hardware / secure lock screen.
+  unsupported,
+
+  /// Hardware present but the user has not enrolled any biometric.
+  notEnrolled,
+}
+
+/// Outcome of a biometric authentication attempt.
+enum BiometricAuthStatus {
+  /// The user authenticated successfully.
+  success,
+
+  /// The user cancelled or failed the prompt (may retry).
+  failed,
+
+  /// Biometrics cannot be used; caller should fall back to PIN / TOTP entry.
+  fallbackRequired,
+
+  /// Too many attempts; biometrics are temporarily/permanently locked.
+  lockedOut,
+}
+
+/// Immutable result returned from [BiometricService.authenticate].
+@immutable
+class BiometricAuthResult {
+  const BiometricAuthResult(this.status, {this.message});
+
+  final BiometricAuthStatus status;
+
+  /// User-friendly message suitable for display (never a raw exception).
+  final String? message;
+
+  bool get isSuccess => status == BiometricAuthStatus.success;
+  bool get shouldFallback =>
+      status == BiometricAuthStatus.fallbackRequired ||
+      status == BiometricAuthStatus.lockedOut;
+}
+
+/// Wraps the platform biometric APIs (Face ID / Touch ID / Fingerprint).
+///
+/// This service holds no UI state. Screens depend on it via constructor
+/// injection so it can be replaced with a fake in tests.
+class BiometricService {
+  BiometricService({LocalAuthentication? localAuth})
+      : _localAuth = localAuth ?? LocalAuthentication();
+
+  final LocalAuthentication _localAuth;
+
+  static const String defaultLocalizedReason =
+      'Authenticate to verify your identity';
+
+  /// Returns whether biometrics are supported and enrolled on this device.
+  Future<BiometricAvailability> checkAvailability() async {
+    try {
+      final bool deviceSupported = await _localAuth.isDeviceSupported();
+      final bool canCheck = await _localAuth.canCheckBiometrics;
+
+      if (!deviceSupported || !canCheck) {
+        return BiometricAvailability.unsupported;
+      }
+
+      final List<BiometricType> enrolled =
+          await _localAuth.getAvailableBiometrics();
+      if (enrolled.isEmpty) {
+        return BiometricAvailability.notEnrolled;
+      }
+      return BiometricAvailability.available;
+    } on PlatformException catch (e) {
+      debugPrint('BiometricService.checkAvailability error: ${e.code}');
+      return BiometricAvailability.unsupported;
+    } catch (e) {
+      debugPrint('BiometricService.checkAvailability unexpected error: $e');
+      return BiometricAvailability.unsupported;
+    }
+  }
+
+  /// Convenience: true only when biometrics can be used right now.
+  Future<bool> isAvailable() async =>
+      (await checkAvailability()) == BiometricAvailability.available;
+
+  /// Returns the biometric types enrolled on the device (may be empty).
+  Future<List<BiometricType>> getEnrolledBiometrics() async {
+    try {
+      return await _localAuth.getAvailableBiometrics();
+    } catch (_) {
+      return const <BiometricType>[];
+    }
+  }
+
+  /// Prompts the user to authenticate.
+  ///
+  /// [localizedReason] is shown by the OS in the system prompt.
+  /// When [biometricOnly] is false the OS may offer the device passcode
+  /// as a fallback. Never throws; failures are mapped to a
+  /// [BiometricAuthResult] so callers can fall back to PIN entry.
+  Future<BiometricAuthResult> authenticate({
+    String localizedReason = defaultLocalizedReason,
+    bool biometricOnly = false,
+  }) async {
+    final BiometricAvailability availability = await checkAvailability();
+    if (availability == BiometricAvailability.unsupported) {
+      return const BiometricAuthResult(
+        BiometricAuthStatus.fallbackRequired,
+        message: 'Biometric sign-in is not available on this device. '
+            'Please enter your code instead.',
+      );
+    }
+    if (availability == BiometricAvailability.notEnrolled) {
+      return const BiometricAuthResult(
+        BiometricAuthStatus.fallbackRequired,
+        message: 'No fingerprint or face is set up on this device. '
+            'Please enter your code instead.',
+      );
+    }
+
+    try {
+      final bool ok = await _localAuth.authenticate(
+        localizedReason: localizedReason,
+        options: AuthenticationOptions(
+          biometricOnly: biometricOnly,
+          stickyAuth: true,
+          useErrorDialogs: true,
+        ),
+      );
+      if (ok) {
+        return const BiometricAuthResult(BiometricAuthStatus.success);
+      }
+      return const BiometricAuthResult(
+        BiometricAuthStatus.failed,
+        message: 'We couldn\'t verify you. Please try again.',
+      );
+    } on PlatformException catch (e) {
+      return _mapPlatformException(e);
+    } catch (e) {
+      debugPrint('BiometricService.authenticate unexpected error: $e');
+      return const BiometricAuthResult(
+        BiometricAuthStatus.fallbackRequired,
+        message: 'Biometric sign-in is unavailable right now. '
+            'Please enter your code instead.',
+      );
+    }
+  }
+
+  BiometricAuthResult _mapPlatformException(PlatformException e) {
+    debugPrint('BiometricService.authenticate error: ${e.code}');
+    switch (e.code) {
+      case 'LockedOut':
+        return const BiometricAuthResult(
+          BiometricAuthStatus.lockedOut,
+          message: 'Too many attempts. Please wait a moment or '
+              'enter your code instead.',
+        );
+      case 'PermanentlyLockedOut':
+        return const BiometricAuthResult(
+          BiometricAuthStatus.lockedOut,
+          message: 'Biometrics are locked. Unlock your device or '
+              'enter your code instead.',
+        );
+      case 'NotEnrolled':
+      case 'NotAvailable':
+      case 'PasscodeNotSet':
+        return const BiometricAuthResult(
+          BiometricAuthStatus.fallbackRequired,
+          message: 'Biometric sign-in is not set up on this device. '
+              'Please enter your code instead.',
+        );
+      default:
+        return const BiometricAuthResult(
+          BiometricAuthStatus.failed,
+          message: 'Biometric verification failed. Please try again.',
+        );
+    }
+  }
+
+  /// Cancels any in-flight authentication prompt.
+  Future<void> cancel() async {
+    try {
+      await _localAuth.stopAuthentication();
+    } catch (_) {
+      // Best effort; nothing to surface to the user.
+    }
+  }
+}
+```
+***END_FILE***
+
+***FILE: mobile/lib/features/auth/screens/mfa_verify_screen.dart***
+```dart
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+import '../services/biometric_service.dart';
+
+/// Length of a TOTP code.
+const int _kCodeLength = 6;
+
+/// TOTP refresh window in seconds.
+const int _kTotpWindowSeconds = 30;
+
+/// MFA verification screen.
+///
+/// Presentation only: the actual code verification is injected via
+/// [onVerify] (returns true when the code is valid) and navigation /
+/// session handling is delegated to [onVerified].
+class MfaVerifyScreen extends StatefulWidget {
+  const MfaVerifyScreen({
+    super.key,
+    required this.onVerify,
+    required this.onVerified,
+    this.biometricService,
+    this.biometricEnabled = false,
+  });
+
+  /// Verifies a 6-digit code. Return true if valid, false if invalid.
+  /// May throw on network/server errors (a friendly message is shown).
+  final Future<bool> Function(String code) onVerify;
+
+  /// Called once verification (code or biometric) succeeds.
+  final VoidCallback onVerified;
+
+  /// Injected biometric service; a default one is created when omitted
+  /// and [biometricEnabled] is true.
+  final BiometricService? biometricService;
+
+  /// Whether the user has enabled biometric unlock.
+  final bool biometricEnabled;
+
+  @override
+  State<MfaVerifyScreen> createState() => _MfaVerifyScreenState();
+}
+
+class _MfaVerifyScreenState extends State<MfaVerifyScreen> {
+  final TextEditingController _codeController = TextEditingController();
+  final FocusNode _focusNode = FocusNode();
+
+  late final BiometricService? _biometricService;
+  Timer? _timer;
+
+  int _secondsRemaining = _kTotpWindowSeconds;
+  bool _isLoading = false;
+  bool _biometricAvailable = false;
+  String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    _biometricService = widget.biometricEnabled
+        ? (widget.biometricService ?? BiometricService())
+        : null;
+    _secondsRemaining = _computeSecondsRemaining();
+    _startTimer();
+    _initBiometrics();
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _codeController.dispose();
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  // ---------------------------------------------------------------------------
+  // Timer
+  // ---------------------------------------------------------------------------
+
+  /// Seconds left in the current TOTP window, aligned to the wall clock so it
+  /// matches authenticator apps.
+  int _computeSecondsRemaining() {
+    final int nowSeconds = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+    return _kTotpWindowSeconds - (nowSeconds % _kTotpWindowSeconds);
+  }
+
+  void _startTimer() {
+    _timer?.cancel();
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (!mounted) return;
+      final int next = _computeSecondsRemaining();
+      final bool windowRolled = next > _secondsRemaining;
+      setState(() {
+        _secondsRemaining = next;
+        if (windowRolled && !_isLoading) {
+          // A new code is now valid; discard stale partial input.
+          _codeController.clear();
+          _errorMessage = null;
+        }
+      });
+    });
+  }
+
+  // ---------------------------------------------------------------------------
+  // Biometrics
+  // ---------------------------------------------------------------------------
+
+  Future<void> _initBiometrics() async {
+    final BiometricService? service = _biometricService;
+    if (service == null) return;
+    final bool available = await service.isAvailable();
+    if (!mounted) return;
+    setState(() => _biometricAvailable = available);
+  }
+
+  Future<void> _onBiometricPressed() async {
+    final BiometricService? service = _biometricService;
+    if (service == null || _isLoading) return;
+
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    final BiometricAuthResult result = await service.authenticate(
+      localizedReason: 'Authenticate to complete sign-in',
+    );
+    if (!mounted) return;
+
+    if (result.isSuccess) {
+      setState(() => _isLoading = false);
+      widget.onVerified();
+      return;
+    }
+
+    setState(() {
+      _isLoading = false;
+      _errorMessage = result.message;
+      if (result.shouldFallback) {
+        

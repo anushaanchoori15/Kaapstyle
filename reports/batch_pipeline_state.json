@@ -1,0 +1,86 @@
+{
+  "version": "1.0",
+  "project": "KAAPSTYLE",
+  "repo_url": "https://github.com/anushaanchoori15/Kaapstyle.git",
+  "total_batches": 50,
+  "completed_count": 1,
+  "current_batch": "BATCH-02",
+  "last_updated": "2026-10-14T13:53:00Z",
+  "batches": {
+    "BATCH-01": {
+      "name": "User Registration, Login & Core Auth Infrastructure",
+      "cr_ids": ["CR17"],
+      "uc_ids": ["CR17-UC01", "CR17-UC02", "CR17-UC03"],
+      "branch": "batch-01-auth",
+      "status": "DONE",
+      "completed_at": "2026-10-14T13:50:00Z",
+      "commit_main": "1ea9aa9",
+      "verification": "PASSED (flutter analyze 0 errors)",
+      "spend_usd": 0.4091
+    },
+    "BATCH-02": {
+      "name": "MFA, Biometric Login & Refresh Token Rotation",
+      "cr_ids": ["CR17"],
+      "uc_ids": ["CR17-UC04", "CR17-UC05", "CR17-UC06", "CR17-UC07"],
+      "branch": "batch-02-mfa-security",
+      "status": "IN_PROGRESS",
+      "spend_usd": 0.0
+    },
+    "BATCH-03": {
+      "name": "Password Reset, Email Verification & Account Recovery",
+      "cr_ids": ["CR17"],
+      "uc_ids": ["CR17-UC08", "CR17-UC09", "CR17-UC10", "CR17-UC11"],
+      "branch": "batch-03-password-reset",
+      "status": "PENDING"
+    },
+    "BATCH-04": {
+      "name": "Profile Preferences, Security Logging & Privacy Controls",
+      "cr_ids": ["CR17"],
+      "uc_ids": ["CR17-UC12", "CR17-UC13", "CR17-UC14", "CR17-UC15"],
+      "branch": "batch-04-privacy-controls",
+      "status": "PENDING"
+    },
+    "BATCH-05": {
+      "name": "Account Deletion, GDPR Data Export & Purge Jobs",
+      "cr_ids": ["CR17"],
+      "uc_ids": ["CR17-UC16", "CR17-UC17", "CR17-UC18", "CR17-UC19", "CR17-UC20"],
+      "branch": "batch-05-gdpr-purge",
+      "status": "PENDING"
+    },
+    "BATCH-06": {
+      "name": "Anti-Abuse, Rate-Limiting & Security Defense",
+      "cr_ids": ["CR15"],
+      "uc_ids": ["CR15-UC01", "CR15-UC02", "CR15-UC03", "CR15-UC04", "CR15-UC05", "CR15-UC06"],
+      "branch": "batch-06-security-defense",
+      "status": "PENDING"
+    },
+    "BATCH-07": {
+      "name": "Camera Capture, Multi-Photo Picker & S3 Pre-Signed Uploads",
+      "cr_ids": ["CR01"],
+      "uc_ids": ["CR01-UC01", "CR01-UC02", "CR01-UC03", "CR01-UC04"],
+      "branch": "batch-07-camera-picker",
+      "status": "PENDING"
+    },
+    "BATCH-08": {
+      "name": "Bounded Batch Image Compression & Durable Upload Queue",
+      "cr_ids": ["CR01"],
+      "uc_ids": ["CR01-UC05", "CR01-UC06", "CR01-UC07", "CR01-UC08"],
+      "branch": "batch-08-image-compression-queue",
+      "status": "PENDING"
+    },
+    "BATCH-09": {
+      "name": "EXIF Scrubbing, GPS Stripping & Server File Sanitization",
+      "cr_ids": ["CR01"],
+      "uc_ids": ["CR01-UC09", "CR01-UC10", "CR01-UC11", "CR01-UC12"],
+      "branch": "batch-09-exif-sanitization",
+      "status": "PENDING"
+    },
+    "BATCH-10": {
+      "name": "Background Removal, Garment Masking & Transparent Canvas",
+      "cr_ids": ["CR01"],
+      "uc_ids": ["CR01-UC13", "CR01-UC14", "CR01-UC15", "CR01-UC16", "CR01-UC17"],
+      "branch": "batch-10-background-removal",
+      "status": "PENDING"
+    }
+  }
+}

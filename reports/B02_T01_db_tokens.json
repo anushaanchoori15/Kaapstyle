@@ -1,0 +1,25 @@
+{
+  "job_id": "JOB-B02-DB-001",
+  "cr_id": "CR17",
+  "uc_id": "UC04",
+  "task_id": "T01",
+  "subtask_ids": ["B02-DB-ST01"],
+  "priority": "P0",
+  "owner_request": "Write Flyway migration V2__create_user_tokens_table.sql for MySQL with utf8mb4 encoding:\n1. CREATE TABLE user_refresh_tokens (id BIGINT AUTO_INCREMENT PRIMARY KEY, user_id BIGINT NOT NULL, token_hash VARCHAR(255) NOT NULL UNIQUE, device_info VARCHAR(255) NULL, expires_at TIMESTAMP NOT NULL, is_revoked BOOLEAN NOT NULL DEFAULT FALSE, created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, CONSTRAINT fk_refresh_tokens_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE, INDEX idx_refresh_token_user (user_id))\n2. CREATE TABLE user_totp_secrets (user_id BIGINT PRIMARY KEY, secret_key VARCHAR(255) NOT NULL, is_enabled BOOLEAN NOT NULL DEFAULT FALSE, backup_codes TEXT NULL, created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, CONSTRAINT fk_totp_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;",
+  "worker_role": "AGENT_C_QA",
+  "key_alias": "KEY_C",
+  "model": "claude-haiku-5-5",
+  "allowed_paths": [
+    "backend/src/main/resources/db/migration/V2__create_user_tokens_table.sql"
+  ],
+  "forbidden_paths": [
+    "AGENTS.md",
+    "tools/*",
+    "mobile/*",
+    "reports/*"
+  ],
+  "context_files": [],
+  "max_task_usd": 1.00,
+  "required_tests": [],
+  "approval_status": "APPROVED"
+}

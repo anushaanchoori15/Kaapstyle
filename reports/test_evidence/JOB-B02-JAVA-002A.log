@@ -1,0 +1,193 @@
+JOB ID: JOB-B02-JAVA-002A
+MODE: LIVE API CALL
+REQUEST ID: req_011Cg2F8cyPJcB4G2c3z82hr
+MODEL: claude-sonnet-5-5
+STOP REASON: end_turn
+IS TRUNCATED: False
+COST USD: 0.054942
+APPLIED FILES:
+  - backend/src/main/java/com/kaapstyle/auth/service/MfaService.java: Successfully written: backend\src\main\java\com\kaapstyle\auth\service\MfaService.java
+
+RAW OUTPUT:
+This is the `MfaService` file. I couldn't see the existing model and repository classes, so I assumed their packages, field names and finder methods. Adjust these if they differ:
+
+- **Packages:** `com.kaapstyle.auth.model` for entities and `com.kaapstyle.auth.repository` for repositories.
+- **`TotpSecret`:** has `user`, `secret` and `isEnabled`, accessed through `setUser`, `setSecret`, `setIsEnabled` and `getIsEnabled`.
+- **`RefreshToken`:** has `user`, `tokenHash`, `expiresAt` (`Instant`) and `isRevoked`.
+- **`TotpSecretRepository`:** provides `findByUserId(Long)`.
+- **`RefreshTokenRepository`:** provides `findByTokenHash(String)`.
+
+***FILE: backend/src/main/java/com/kaapstyle/auth/service/MfaService.java***
+package com.kaapstyle.auth.service;
+
+import com.kaapstyle.auth.model.RefreshToken;
+import com.kaapstyle.auth.model.TotpSecret;
+import com.kaapstyle.auth.model.User;
+import com.kaapstyle.auth.repository.RefreshTokenRepository;
+import com.kaapstyle.auth.repository.TotpSecretRepository;
+import com.kaapstyle.auth.repository.UserRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import java.nio.ByteBuffer;
+import java.security.GeneralSecurityException;
+import java.security.SecureRandom;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.UUID;
+
+@Service
+public class MfaService {
+
+    private static final String BASE32_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+    private static final int SECRET_LENGTH = 16;
+    private static final int TIME_STEP_SECONDS = 30;
+    private static final int CODE_DIGITS = 6;
+    private static final int ALLOWED_DRIFT_STEPS = 1;
+    private static final long REFRESH_TOKEN_DAYS = 30;
+
+    private final SecureRandom secureRandom = new SecureRandom();
+
+    private final TotpSecretRepository totpSecretRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final UserRepository userRepository;
+
+    public MfaService(TotpSecretRepository totpSecretRepository,
+                      RefreshTokenRepository refreshTokenRepository,
+                      UserRepository userRepository) {
+        this.totpSecretRepository = totpSecretRepository;
+        this.refreshTokenRepository = refreshTokenRepository;
+        this.userRepository = userRepository;
+    }
+
+    /**
+     * Generates a random 16-character base32 secret and saves it (or replaces the existing one)
+     * with isEnabled=false.
+     */
+    @Transactional
+    public String generateTotpSecret(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
+
+        StringBuilder sb = new StringBuilder(SECRET_LENGTH);
+        for (int i = 0; i < SECRET_LENGTH; i++) {
+            sb.append(BASE32_ALPHABET.charAt(secureRandom.nextInt(BASE32_ALPHABET.length())));
+        }
+        String secret = sb.toString();
+
+        TotpSecret entity = totpSecretRepository.findByUserId(userId).orElseGet(TotpSecret::new);
+        entity.setUser(user);
+        entity.setSecret(secret);
+        entity.setIsEnabled(false);
+        totpSecretRepository.save(entity);
+
+        return secret;
+    }
+
+    /**
+     * Verifies a 6-digit TOTP code (30s time step, +/- 1 step drift).
+     * On success the secret is enabled.
+     */
+    @Transactional
+    public boolean verifyTotpCode(Long userId, String code) {
+        if (code == null || !code.matches("\\d{" + CODE_DIGITS + "}")) {
+            return false;
+        }
+        TotpSecret entity = totpSecretRepository.findByUserId(userId).orElse(null);
+        if (entity == null) {
+            return false;
+        }
+
+        byte[] key = decodeBase32(entity.getSecret());
+        long currentStep = Instant.now().getEpochSecond() / TIME_STEP_SECONDS;
+
+        boolean valid = false;
+        for (int offset = -ALLOWED_DRIFT_STEPS; offset <= ALLOWED_DRIFT_STEPS; offset++) {
+            String expected = generateCode(key, currentStep + offset);
+            if (java.security.MessageDigest.isEqual(expected.getBytes(), code.getBytes())) {
+                valid = true;
+            }
+        }
+
+        if (valid) {
+            entity.setIsEnabled(true);
+            totpSecretRepository.save(entity);
+        }
+        return valid;
+    }
+
+    /**
+     * Revokes the old refresh token and issues a new one valid for 30 days.
+     * Returns the new token string.
+     */
+    @Transactional
+    public String rotateRefreshToken(Long userId, String oldTokenHash) {
+        RefreshToken old = refreshTokenRepository.findByTokenHash(oldTokenHash)
+                .orElseThrow(() -> new IllegalArgumentException("Refresh token not found"));
+
+        if (!old.getUser().getId().equals(userId)) {
+            throw new IllegalArgumentException("Refresh token does not belong to user");
+        }
+        if (Boolean.TRUE.equals(old.getIsRevoked()) || old.getExpiresAt().isBefore(Instant.now())) {
+            throw new IllegalStateException("Refresh token is revoked or expired");
+        }
+
+        old.setIsRevoked(true);
+        refreshTokenRepository.save(old);
+
+        String newToken = UUID.randomUUID().toString();
+        RefreshToken fresh = new RefreshToken();
+        fresh.setUser(old.getUser());
+        fresh.setTokenHash(newToken);
+        fresh.setExpiresAt(Instant.now().plus(REFRESH_TOKEN_DAYS, ChronoUnit.DAYS));
+        fresh.setIsRevoked(false);
+        refreshTokenRepository.save(fresh);
+
+        return newToken;
+    }
+
+    // ---- RFC 6238 / RFC 4226 helpers ----
+
+    private String generateCode(byte[] key, long step) {
+        try {
+            Mac mac = Mac.getInstance("HmacSHA1");
+            mac.init(new SecretKeySpec(key, "HmacSHA1"));
+            byte[] hash = mac.doFinal(ByteBuffer.allocate(8).putLong(step).array());
+
+            int offset = hash[hash.length - 1] & 0x0F;
+            int binary = ((hash[offset] & 0x7F) << 24)
+                    | ((hash[offset + 1] & 0xFF) << 16)
+                    | ((hash[offset + 2] & 0xFF) << 8)
+                    | (hash[offset + 3] & 0xFF);
+
+            int otp = binary % (int) Math.pow(10, CODE_DIGITS);
+            return String.format("%0" + CODE_DIGITS + "d", otp);
+        } catch (GeneralSecurityException e) {
+            throw new IllegalStateException("Unable to compute TOTP", e);
+        }
+    }
+
+    private byte[] decodeBase32(String encoded) {
+        String input = encoded.toUpperCase();
+        byte[] out = new byte[input.length() * 5 / 8];
+        int buffer = 0;
+        int bits = 0;
+        int idx = 0;
+        for (char c : input.toCharArray()) {
+            int val = BASE32_ALPHABET.indexOf(c);
+            if (val < 0) {
+                throw new IllegalArgumentException("Invalid base32 character: " + c);
+            }
+            buffer = (buffer << 5) | val;
+            bits += 5;
+            if (bits >= 8) {
+                out[idx++] = (byte) ((buffer >> (bits - 8)) & 0xFF);
+                bits -= 8;
+            }
+        }
+        return out;
+    }
+}
+***END_FILE***
