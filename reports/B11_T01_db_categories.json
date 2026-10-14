@@ -1,0 +1,25 @@
+{
+  "job_id": "JOB-B11-DB-001",
+  "cr_id": "CR02",
+  "uc_id": "UC01",
+  "task_id": "T01",
+  "subtask_ids": ["B11-DB-ST01"],
+  "priority": "P0",
+  "owner_request": "Write Flyway migration V11__create_clothing_categories_table.sql for MySQL with utf8mb4 encoding:\nCREATE TABLE clothing_categories (\n  id BIGINT AUTO_INCREMENT PRIMARY KEY,\n  category_code VARCHAR(50) NOT NULL UNIQUE,\n  display_name VARCHAR(100) NOT NULL,\n  parent_id BIGINT NULL,\n  icon_name VARCHAR(50) NULL,\n  sort_order INT NOT NULL DEFAULT 0,\n  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  CONSTRAINT fk_cat_parent FOREIGN KEY (parent_id) REFERENCES clothing_categories(id) ON DELETE SET NULL\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;\n\nINSERT INTO clothing_categories (category_code, display_name, icon_name, sort_order) VALUES\n('TOPS', 'Tops & Shirts', 'checkroom', 1),\n('BOTTOMS', 'Pants & Bottoms', 'accessibility', 2),\n('DRESSES', 'Dresses & Jumpsuits', 'woman', 3),\n('OUTERWEAR', 'Jackets & Coats', 'dry_cleaning', 4),\n('FOOTWEAR', 'Shoes & Footwear', 'roller_skating', 5),\n('ACCESSORIES', 'Bags & Accessories', 'watch', 6);",
+  "worker_role": "AGENT_C_QA",
+  "key_alias": "KEY_C",
+  "model": "claude-haiku-5-5",
+  "allowed_paths": [
+    "backend/src/main/resources/db/migration/V11__create_clothing_categories_table.sql"
+  ],
+  "forbidden_paths": [
+    "AGENTS.md",
+    "tools/*",
+    "mobile/*",
+    "reports/*"
+  ],
+  "context_files": [],
+  "max_task_usd": 1.00,
+  "required_tests": [],
+  "approval_status": "APPROVED"
+}

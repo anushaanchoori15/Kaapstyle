@@ -1,0 +1,21 @@
+-- V11: Create clothing_categories table (MySQL 8, utf8mb4)
+-- Ref: CR02 -> UC01 -> T01 (B11-DB-ST01)
+
+CREATE TABLE clothing_categories (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  category_code VARCHAR(50) NOT NULL UNIQUE,
+  display_name VARCHAR(100) NOT NULL,
+  parent_id BIGINT NULL,
+  icon_name VARCHAR(50) NULL,
+  sort_order INT NOT NULL DEFAULT 0,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_cat_parent FOREIGN KEY (parent_id) REFERENCES clothing_categories(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+INSERT INTO clothing_categories (category_code, display_name, icon_name, sort_order) VALUES
+('TOPS', 'Tops & Shirts', 'checkroom', 1),
+('BOTTOMS', 'Pants & Bottoms', 'accessibility', 2),
+('DRESSES', 'Dresses & Jumpsuits', 'woman', 3),
+('OUTERWEAR', 'Jackets & Coats', 'dry_cleaning', 4),
+('FOOTWEAR', 'Shoes & Footwear', 'roller_skating', 5),
+('ACCESSORIES', 'Bags & Accessories', 'watch', 6);
