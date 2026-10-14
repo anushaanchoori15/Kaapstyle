@@ -1,0 +1,25 @@
+{
+  "job_id": "JOB-B09-JAVA-001",
+  "cr_id": "CR01",
+  "uc_id": "UC09",
+  "task_id": "T02",
+  "subtask_ids": ["B09-JAVA-ST01"],
+  "priority": "P0",
+  "owner_request": "Create backend/src/main/java/com/kaapstyle/media/model/MediaSanitizationLog.java. Implement JPA Entity mapping table 'media_sanitization_logs' with fields: id (Long PK GeneratedValue), mediaId (Long nullable=false), originalHasExif (Boolean), gpsStripped (Boolean), deviceInfoStripped (Boolean), sanitizedMimeType (String 100), sanitizedBytes (Long), sanitizedAt (LocalDateTime @CreationTimestamp). Include constructors, getters, setters, builder or fluent methods cleanly.",
+  "worker_role": "AGENT_B_JAVA",
+  "key_alias": "KEY_B",
+  "model": "claude-haiku-5-5",
+  "allowed_paths": [
+    "backend/src/main/java/com/kaapstyle/media/model/MediaSanitizationLog.java"
+  ],
+  "forbidden_paths": [
+    "AGENTS.md",
+    "tools/*",
+    "mobile/*",
+    "reports/*"
+  ],
+  "context_files": [],
+  "max_task_usd": 1.00,
+  "required_tests": [],
+  "approval_status": "APPROVED"
+}

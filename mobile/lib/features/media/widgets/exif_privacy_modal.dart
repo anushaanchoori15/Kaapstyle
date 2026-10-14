@@ -1,0 +1,136 @@
+import 'package:flutter/material.dart';
+
+/// Result returned when the user authorizes the upload.
+class ExifPrivacyResult {
+  const ExifPrivacyResult({
+    required this.stripLocation,
+    required this.stripDevice,
+  });
+
+  final bool stripLocation;
+  final bool stripDevice;
+}
+
+/// Privacy confirmation modal shown before cloud upload of media.
+/// Presents EXIF stripping options and returns an [ExifPrivacyResult]
+/// on authorization, or null if dismissed.
+class ExifPrivacyModal extends StatefulWidget {
+  const ExifPrivacyModal({super.key});
+
+  static Future<ExifPrivacyResult?> show(BuildContext context) {
+    return showModalBottomSheet<ExifPrivacyResult>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      useSafeArea: true,
+      builder: (_) => const ExifPrivacyModal(),
+    );
+  }
+
+  @override
+  State<ExifPrivacyModal> createState() => _ExifPrivacyModalState();
+}
+
+class _ExifPrivacyModalState extends State<ExifPrivacyModal> {
+  bool _stripLocation = true;
+  bool _stripDevice = true;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Security badge
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: scheme.primaryContainer,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.verified_user_outlined,
+                  color: scheme.onPrimaryContainer,
+                  size: 32,
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Text(
+                    'EXIF metadata (GPS coordinates, camera model, lens '
+                    'serials, date taken) will be automatically removed '
+                    'prior to cloud upload.',
+                    style: textTheme.bodyMedium?.copyWith(
+                      color: scheme.onPrimaryContainer,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Toggles
+          SwitchListTile(
+            contentPadding: EdgeInsets.zero,
+            title: const Text('Strip Location Data'),
+            subtitle: const Text('GPS coordinates and location tags'),
+            value: _stripLocation,
+            onChanged: (value) => setState(() => _stripLocation = value),
+          ),
+          SwitchListTile(
+            contentPadding: EdgeInsets.zero,
+            title: const Text('Strip Device Metadata'),
+            subtitle: const Text('Camera model, lens serials, date taken'),
+            value: _stripDevice,
+            onChanged: (value) => setState(() => _stripDevice = value),
+          ),
+          const SizedBox(height: 8),
+
+          // Privacy details
+          ExpansionTile(
+            tilePadding: EdgeInsets.zero,
+            shape: const RoundedRectangleBorder(side: BorderSide.none),
+            collapsedShape: const RoundedRectangleBorder(side: BorderSide.none),
+            leading: Icon(Icons.gavel_outlined, color: scheme.primary),
+            title: const Text('Privacy Details'),
+            childrenPadding: const EdgeInsets.only(bottom: 12),
+            expandedCrossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Under the GDPR (Regulation (EU) 2016/679), personal data must '
+                'be processed lawfully, fairly and with data minimisation '
+                '(Article 5). EXIF metadata can reveal where and when you were, '
+                'and identify your devices, which makes it personal data.\n\n'
+                'Stripping this metadata before upload applies privacy by design '
+                'and by default (Article 25) and limits exposure of sensitive '
+                'location information. You can change these settings at any '
+                'time for future uploads.',
+                style: textTheme.bodySmall,
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+
+          // Authorize
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(
+              ExifPrivacyResult(
+                stripLocation: _stripLocation,
+                stripDevice: _stripDevice,
+              ),
+            ),
+            child: const Text('Authorize & Continue'),
+          ),
+        ],
+      ),
+    );
+  }
+}

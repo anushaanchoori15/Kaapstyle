@@ -1,0 +1,25 @@
+{
+  "job_id": "JOB-B09-FLUTTER-001",
+  "cr_id": "CR01",
+  "uc_id": "UC09",
+  "task_id": "T03",
+  "subtask_ids": ["B09-FLUTTER-ST01"],
+  "priority": "P0",
+  "owner_request": "Create mobile/lib/features/media/widgets/exif_privacy_modal.dart using Flutter Material3. Write a clean privacy confirmation modal (<160 lines) that displays: a security badge informing the user that EXIF metadata (GPS coordinates, camera model, lens serials, date taken) will be automatically removed prior to cloud upload. Include: toggle switches for 'Strip Location Data' (default ON) and 'Strip Device Metadata' (default ON), a 'Privacy Details' expandable section explaining GDPR compliance, and an 'Authorize & Continue' button. Ensure clean imports and no deprecated widgets.",
+  "worker_role": "AGENT_A_FLUTTER",
+  "key_alias": "KEY_A",
+  "model": "claude-haiku-5-5",
+  "allowed_paths": [
+    "mobile/lib/features/media/widgets/exif_privacy_modal.dart"
+  ],
+  "forbidden_paths": [
+    "AGENTS.md",
+    "tools/*",
+    "backend/*",
+    "reports/*"
+  ],
+  "context_files": [],
+  "max_task_usd": 1.00,
+  "required_tests": [],
+  "approval_status": "APPROVED"
+}

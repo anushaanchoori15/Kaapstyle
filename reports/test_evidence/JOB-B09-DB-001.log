@@ -1,0 +1,35 @@
+JOB ID: JOB-B09-DB-001
+MODE: LIVE API CALL
+REQUEST ID: req_011Cg2JqJDkfuzcRkNbYfZek
+MODEL: claude-haiku-5-5
+STOP REASON: end_turn
+IS TRUNCATED: False
+COST USD: 0.003796
+APPLIED FILES:
+  - backend/src/main/resources/db/migration/V9__create_media_sanitization_table.sql: Successfully written: backend\src\main\resources\db\migration\V9__create_media_sanitization_table.sql
+
+RAW OUTPUT:
+***FILE: backend/src/main/resources/db/migration/V9__create_media_sanitization_table.sql***
+```sql
+-- Flyway migration V9
+-- Hierarchy: CR01 -> UC09 -> T01 (B09-DB-ST01)
+-- Creates the audit table for media sanitization (EXIF/GPS/device info stripping).
+
+CREATE TABLE media_sanitization_logs (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  media_id BIGINT NOT NULL,
+  original_has_exif BOOLEAN NOT NULL DEFAULT FALSE,
+  gps_stripped BOOLEAN NOT NULL DEFAULT FALSE,
+  device_info_stripped BOOLEAN NOT NULL DEFAULT FALSE,
+  sanitized_mime_type VARCHAR(100) NOT NULL,
+  sanitized_bytes BIGINT NOT NULL,
+  sanitized_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_sanitization_media FOREIGN KEY (media_id) REFERENCES media_files(id) ON DELETE CASCADE,
+  INDEX idx_sanitization_media (media_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+```
+***END_FILE***
+
+Notes:
+- The foreign key requires the `media_files` table (with a `BIGINT` primary key `id`) to exist from an earlier migration. Flyway will fail on a fresh database if V1–V8 don't create it.
+- The `ON DELETE CASCADE` means deleting a media file also deletes its sanitization logs, so the audit trail is removed along with the media. If the audit history must outlive the media, change this to `ON DELETE RESTRICT` or drop the foreign key.

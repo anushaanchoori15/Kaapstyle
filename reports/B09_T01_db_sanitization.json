@@ -1,0 +1,25 @@
+{
+  "job_id": "JOB-B09-DB-001",
+  "cr_id": "CR01",
+  "uc_id": "UC09",
+  "task_id": "T01",
+  "subtask_ids": ["B09-DB-ST01"],
+  "priority": "P0",
+  "owner_request": "Write Flyway migration V9__create_media_sanitization_table.sql for MySQL with utf8mb4 encoding:\nCREATE TABLE media_sanitization_logs (\n  id BIGINT AUTO_INCREMENT PRIMARY KEY,\n  media_id BIGINT NOT NULL,\n  original_has_exif BOOLEAN NOT NULL DEFAULT FALSE,\n  gps_stripped BOOLEAN NOT NULL DEFAULT FALSE,\n  device_info_stripped BOOLEAN NOT NULL DEFAULT FALSE,\n  sanitized_mime_type VARCHAR(100) NOT NULL,\n  sanitized_bytes BIGINT NOT NULL,\n  sanitized_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  CONSTRAINT fk_sanitization_media FOREIGN KEY (media_id) REFERENCES media_files(id) ON DELETE CASCADE,\n  INDEX idx_sanitization_media (media_id)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;",
+  "worker_role": "AGENT_C_QA",
+  "key_alias": "KEY_C",
+  "model": "claude-haiku-5-5",
+  "allowed_paths": [
+    "backend/src/main/resources/db/migration/V9__create_media_sanitization_table.sql"
+  ],
+  "forbidden_paths": [
+    "AGENTS.md",
+    "tools/*",
+    "mobile/*",
+    "reports/*"
+  ],
+  "context_files": [],
+  "max_task_usd": 1.00,
+  "required_tests": [],
+  "approval_status": "APPROVED"
+}

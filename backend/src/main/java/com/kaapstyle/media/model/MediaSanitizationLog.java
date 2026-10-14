@@ -1,0 +1,263 @@
+package com.kaapstyle.media.model;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.LocalDateTime;
+import java.util.Objects;
+
+/**
+ * JPA entity recording the outcome of a media sanitization pass
+ * (EXIF / GPS / device info stripping) applied to an uploaded media asset.
+ *
+ * Hierarchy: CR01 -> UC09 -> T02 (B09-JAVA-ST01)
+ */
+@Entity
+@Table(name = "media_sanitization_logs")
+public class MediaSanitizationLog {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
+
+    @Column(name = "media_id", nullable = false)
+    private Long mediaId;
+
+    @Column(name = "original_has_exif")
+    private Boolean originalHasExif;
+
+    @Column(name = "gps_stripped")
+    private Boolean gpsStripped;
+
+    @Column(name = "device_info_stripped")
+    private Boolean deviceInfoStripped;
+
+    @Column(name = "sanitized_mime_type", length = 100)
+    private String sanitizedMimeType;
+
+    @Column(name = "sanitized_bytes")
+    private Long sanitizedBytes;
+
+    @CreationTimestamp
+    @Column(name = "sanitized_at", updatable = false)
+    private LocalDateTime sanitizedAt;
+
+    /** Required by JPA. */
+    protected MediaSanitizationLog() {
+    }
+
+    public MediaSanitizationLog(Long mediaId,
+                                Boolean originalHasExif,
+                                Boolean gpsStripped,
+                                Boolean deviceInfoStripped,
+                                String sanitizedMimeType,
+                                Long sanitizedBytes) {
+        this.mediaId = mediaId;
+        this.originalHasExif = originalHasExif;
+        this.gpsStripped = gpsStripped;
+        this.deviceInfoStripped = deviceInfoStripped;
+        this.sanitizedMimeType = sanitizedMimeType;
+        this.sanitizedBytes = sanitizedBytes;
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    // ----- Getters -----
+
+    public Long getId() {
+        return id;
+    }
+
+    public Long getMediaId() {
+        return mediaId;
+    }
+
+    public Boolean getOriginalHasExif() {
+        return originalHasExif;
+    }
+
+    public Boolean getGpsStripped() {
+        return gpsStripped;
+    }
+
+    public Boolean getDeviceInfoStripped() {
+        return deviceInfoStripped;
+    }
+
+    public String getSanitizedMimeType() {
+        return sanitizedMimeType;
+    }
+
+    public Long getSanitizedBytes() {
+        return sanitizedBytes;
+    }
+
+    public LocalDateTime getSanitizedAt() {
+        return sanitizedAt;
+    }
+
+    // ----- Setters -----
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setMediaId(Long mediaId) {
+        this.mediaId = mediaId;
+    }
+
+    public void setOriginalHasExif(Boolean originalHasExif) {
+        this.originalHasExif = originalHasExif;
+    }
+
+    public void setGpsStripped(Boolean gpsStripped) {
+        this.gpsStripped = gpsStripped;
+    }
+
+    public void setDeviceInfoStripped(Boolean deviceInfoStripped) {
+        this.deviceInfoStripped = deviceInfoStripped;
+    }
+
+    public void setSanitizedMimeType(String sanitizedMimeType) {
+        this.sanitizedMimeType = sanitizedMimeType;
+    }
+
+    public void setSanitizedBytes(Long sanitizedBytes) {
+        this.sanitizedBytes = sanitizedBytes;
+    }
+
+    /** Managed by Hibernate via @CreationTimestamp; setter exposed for tests/mapping only. */
+    public void setSanitizedAt(LocalDateTime sanitizedAt) {
+        this.sanitizedAt = sanitizedAt;
+    }
+
+    // ----- Fluent helpers -----
+
+    public MediaSanitizationLog withMediaId(Long mediaId) {
+        this.mediaId = mediaId;
+        return this;
+    }
+
+    public MediaSanitizationLog withOriginalHasExif(Boolean originalHasExif) {
+        this.originalHasExif = originalHasExif;
+        return this;
+    }
+
+    public MediaSanitizationLog withGpsStripped(Boolean gpsStripped) {
+        this.gpsStripped = gpsStripped;
+        return this;
+    }
+
+    public MediaSanitizationLog withDeviceInfoStripped(Boolean deviceInfoStripped) {
+        this.deviceInfoStripped = deviceInfoStripped;
+        return this;
+    }
+
+    public MediaSanitizationLog withSanitizedMimeType(String sanitizedMimeType) {
+        this.sanitizedMimeType = sanitizedMimeType;
+        return this;
+    }
+
+    public MediaSanitizationLog withSanitizedBytes(Long sanitizedBytes) {
+        this.sanitizedBytes = sanitizedBytes;
+        return this;
+    }
+
+    // ----- Builder -----
+
+    public static final class Builder {
+        private Long mediaId;
+        private Boolean originalHasExif;
+        private Boolean gpsStripped;
+        private Boolean deviceInfoStripped;
+        private String sanitizedMimeType;
+        private Long sanitizedBytes;
+
+        private Builder() {
+        }
+
+        public Builder mediaId(Long mediaId) {
+            this.mediaId = mediaId;
+            return this;
+        }
+
+        public Builder originalHasExif(Boolean originalHasExif) {
+            this.originalHasExif = originalHasExif;
+            return this;
+        }
+
+        public Builder gpsStripped(Boolean gpsStripped) {
+            this.gpsStripped = gpsStripped;
+            return this;
+        }
+
+        public Builder deviceInfoStripped(Boolean deviceInfoStripped) {
+            this.deviceInfoStripped = deviceInfoStripped;
+            return this;
+        }
+
+        public Builder sanitizedMimeType(String sanitizedMimeType) {
+            this.sanitizedMimeType = sanitizedMimeType;
+            return this;
+        }
+
+        public Builder sanitizedBytes(Long sanitizedBytes) {
+            this.sanitizedBytes = sanitizedBytes;
+            return this;
+        }
+
+        public MediaSanitizationLog build() {
+            return new MediaSanitizationLog(
+                    mediaId,
+                    originalHasExif,
+                    gpsStripped,
+                    deviceInfoStripped,
+                    sanitizedMimeType,
+                    sanitizedBytes);
+        }
+    }
+
+    // ----- Identity -----
+
+    /**
+     * Equality based on the persisted identity once assigned; transient entities
+     * are only equal to themselves.
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof MediaSanitizationLog that)) {
+            return false;
+        }
+        return id != null && Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "MediaSanitizationLog{" +
+                "id=" + id +
+                ", mediaId=" + mediaId +
+                ", originalHasExif=" + originalHasExif +
+                ", gpsStripped=" + gpsStripped +
+                ", deviceInfoStripped=" + deviceInfoStripped +
+                ", sanitizedMimeType='" + sanitizedMimeType + '\'' +
+                ", sanitizedBytes=" + sanitizedBytes +
+                ", sanitizedAt=" + sanitizedAt +
+                '}';
+    }
+}
