@@ -1,0 +1,38 @@
+JOB ID: JOB-B08-DB-001
+MODE: LIVE API CALL
+REQUEST ID: req_011Cg2JXKvxEvzQrqiU5j9rt
+MODEL: claude-haiku-5-5
+STOP REASON: end_turn
+IS TRUNCATED: False
+COST USD: 0.004546
+APPLIED FILES:
+  - backend/src/main/resources/db/migration/V8__create_upload_queue_table.sql: Successfully written: backend\src\main\resources\db\migration\V8__create_upload_queue_table.sql
+
+RAW OUTPUT:
+***FILE: backend/src/main/resources/db/migration/V8__create_upload_queue_table.sql***
+```sql
+-- V8: Create upload_queue_tasks table
+-- Hierarchy: CR01 -> UC05 -> T01 (B08-DB-ST01)
+-- Engine/charset: InnoDB, utf8mb4 / utf8mb4_unicode_ci
+
+CREATE TABLE upload_queue_tasks (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  user_id BIGINT NOT NULL,
+  client_task_id VARCHAR(100) NOT NULL UNIQUE,
+  media_id BIGINT NULL,
+  file_name VARCHAR(255) NOT NULL,
+  bytes_uploaded BIGINT NOT NULL DEFAULT 0,
+  total_bytes BIGINT NOT NULL,
+  status VARCHAR(20) NOT NULL DEFAULT 'QUEUED',
+  retry_count INT NOT NULL DEFAULT 0,
+  error_message TEXT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_queue_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  CONSTRAINT fk_queue_media FOREIGN KEY (media_id) REFERENCES media_files(id) ON DELETE SET NULL,
+  INDEX idx_queue_user_status (user_id, status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+```
+***END_FILE***
+
+Note: the foreign keys assume `users(id)` and `media_files(id)` already exist as `BIGINT` columns from earlier migrations (V1–V7). If either referenced column is a different integer type or signedness, the migration will fail at execution time, so verify this before running.
