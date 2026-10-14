@@ -1,0 +1,25 @@
+{
+  "job_id": "JOB-B10-FLUTTER-001",
+  "cr_id": "CR01",
+  "uc_id": "UC13",
+  "task_id": "T03",
+  "subtask_ids": ["B10-FLUTTER-ST01"],
+  "priority": "P0",
+  "owner_request": "Create mobile/lib/features/media/screens/duplicate_review_screen.dart using Flutter Material3. Write a clean review screen (<180 lines) for comparing potential duplicate photos side-by-side: display candidate pairs with similarity percentage badge, thumbnail placeholders, metadata (size, date), and resolution buttons ('Keep Both', 'Delete Duplicate', 'Merge'). Include clear snackbar feedback and handle empty duplicate state gracefully.",
+  "worker_role": "AGENT_A_FLUTTER",
+  "key_alias": "KEY_A",
+  "model": "claude-haiku-5-5",
+  "allowed_paths": [
+    "mobile/lib/features/media/screens/duplicate_review_screen.dart"
+  ],
+  "forbidden_paths": [
+    "AGENTS.md",
+    "tools/*",
+    "backend/*",
+    "reports/*"
+  ],
+  "context_files": [],
+  "max_task_usd": 1.00,
+  "required_tests": [],
+  "approval_status": "APPROVED"
+}

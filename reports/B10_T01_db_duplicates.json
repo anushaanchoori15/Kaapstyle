@@ -1,0 +1,25 @@
+{
+  "job_id": "JOB-B10-DB-001",
+  "cr_id": "CR01",
+  "uc_id": "UC13",
+  "task_id": "T01",
+  "subtask_ids": ["B10-DB-ST01"],
+  "priority": "P0",
+  "owner_request": "Write Flyway migration V10__create_duplicate_detection_tables.sql for MySQL with utf8mb4 encoding:\nCREATE TABLE duplicate_candidate_pairs (\n  id BIGINT AUTO_INCREMENT PRIMARY KEY,\n  user_id BIGINT NOT NULL,\n  original_media_id BIGINT NOT NULL,\n  candidate_media_id BIGINT NOT NULL,\n  similarity_score DECIMAL(5,4) NOT NULL,\n  resolution_status VARCHAR(20) NOT NULL DEFAULT 'PENDING',\n  resolved_at TIMESTAMP NULL,\n  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  CONSTRAINT fk_dup_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,\n  CONSTRAINT fk_dup_orig FOREIGN KEY (original_media_id) REFERENCES media_files(id) ON DELETE CASCADE,\n  CONSTRAINT fk_dup_cand FOREIGN KEY (candidate_media_id) REFERENCES media_files(id) ON DELETE CASCADE,\n  INDEX idx_dup_user_status (user_id, resolution_status)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;",
+  "worker_role": "AGENT_C_QA",
+  "key_alias": "KEY_C",
+  "model": "claude-haiku-5-5",
+  "allowed_paths": [
+    "backend/src/main/resources/db/migration/V10__create_duplicate_detection_tables.sql"
+  ],
+  "forbidden_paths": [
+    "AGENTS.md",
+    "tools/*",
+    "mobile/*",
+    "reports/*"
+  ],
+  "context_files": [],
+  "max_task_usd": 1.00,
+  "required_tests": [],
+  "approval_status": "APPROVED"
+}

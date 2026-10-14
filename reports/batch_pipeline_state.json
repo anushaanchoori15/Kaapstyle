@@ -1,104 +1,73 @@
 {
-  "version": "1.0",
-  "project": "KAAPSTYLE",
-  "repo_url": "https://github.com/anushaanchoori15/Kaapstyle.git",
-  "total_batches": 50,
-  "completed_count": 7,
-  "current_batch": "BATCH-08",
-  "last_updated": "2026-10-14T14:39:00Z",
-  "batches": {
-    "BATCH-01": {
-      "name": "User Registration, Login & Core Auth Infrastructure",
-      "cr_ids": ["CR17"],
-      "uc_ids": ["CR17-UC01", "CR17-UC02", "CR17-UC03"],
+  "total_planned_batches": 50,
+  "completed_batches": [
+    {
+      "batch_id": 1,
       "branch": "batch-01-auth",
-      "status": "DONE",
-      "completed_at": "2026-10-14T13:50:00Z",
-      "commit_main": "1ea9aa9",
-      "verification": "PASSED (flutter analyze 0 errors)",
-      "spend_usd": 0.4091
+      "scope": "CR17-UC01..03 (Registration, Login, JWT tokens)",
+      "status": "MERGED_TO_MAIN",
+      "pushed_to_remote": true
     },
-    "BATCH-02": {
-      "name": "MFA, Biometric Login & Refresh Token Rotation",
-      "cr_ids": ["CR17"],
-      "uc_ids": ["CR17-UC04", "CR17-UC05", "CR17-UC06", "CR17-UC07"],
+    {
+      "batch_id": 2,
       "branch": "batch-02-mfa-security",
-      "status": "DONE",
-      "completed_at": "2026-10-14T14:00:00Z",
-      "commit_main": "0ece8e8",
-      "verification": "PASSED (flutter analyze 0 errors)",
-      "spend_usd": 0.3357
+      "scope": "CR17-UC04..07 (MFA, TOTP Secret, Biometrics)",
+      "status": "MERGED_TO_MAIN",
+      "pushed_to_remote": true
     },
-    "BATCH-03": {
-      "name": "Password Reset, Email Verification & Account Recovery",
-      "cr_ids": ["CR17"],
-      "uc_ids": ["CR17-UC08", "CR17-UC09", "CR17-UC10", "CR17-UC11"],
+    {
+      "batch_id": 3,
       "branch": "batch-03-password-reset",
-      "status": "DONE",
-      "completed_at": "2026-10-14T14:10:00Z",
-      "verification": "PASSED (flutter analyze 0 errors)",
-      "spend_usd": 0.2650
+      "scope": "CR17-UC08..11 (Password recovery, verification tokens)",
+      "status": "MERGED_TO_MAIN",
+      "pushed_to_remote": true
     },
-    "BATCH-04": {
-      "name": "Profile Preferences, Security Logging & Privacy Controls",
-      "cr_ids": ["CR17"],
-      "uc_ids": ["CR17-UC12", "CR17-UC13", "CR17-UC14", "CR17-UC15"],
+    {
+      "batch_id": 4,
       "branch": "batch-04-privacy-controls",
-      "status": "DONE",
-      "completed_at": "2026-10-14T14:22:00Z",
-      "verification": "PASSED (flutter analyze 0 errors)",
-      "spend_usd": 0.2015
+      "scope": "CR17-UC12..15 (Profile privacy, audit logs)",
+      "status": "MERGED_TO_MAIN",
+      "pushed_to_remote": true
     },
-    "BATCH-05": {
-      "name": "Account Deletion, GDPR Data Export & Purge Jobs",
-      "cr_ids": ["CR17"],
-      "uc_ids": ["CR17-UC16", "CR17-UC17", "CR17-UC18", "CR17-UC19", "CR17-UC20"],
+    {
+      "batch_id": 5,
       "branch": "batch-05-gdpr-purge",
-      "status": "DONE",
-      "completed_at": "2026-10-14T14:27:00Z",
-      "verification": "PASSED (flutter analyze 0 errors)",
-      "spend_usd": 0.1564
+      "scope": "CR17-UC16..20 (GDPR data export, account deletion)",
+      "status": "MERGED_TO_MAIN",
+      "pushed_to_remote": true
     },
-    "BATCH-06": {
-      "name": "Anti-Abuse, Rate-Limiting & Security Defense",
-      "cr_ids": ["CR15"],
-      "uc_ids": ["CR15-UC01", "CR15-UC02", "CR15-UC03", "CR15-UC04", "CR15-UC05", "CR15-UC06"],
+    {
+      "batch_id": 6,
       "branch": "batch-06-security-defense",
-      "status": "DONE",
-      "completed_at": "2026-10-14T14:35:00Z",
-      "verification": "PASSED (flutter analyze 0 errors)",
-      "spend_usd": 0.1403
+      "scope": "CR15-UC01..06 (IP rate limiting, brute force lockout)",
+      "status": "MERGED_TO_MAIN",
+      "pushed_to_remote": true
     },
-    "BATCH-07": {
-      "name": "Camera Capture, Multi-Photo Picker & S3 Pre-Signed Uploads",
-      "cr_ids": ["CR01"],
-      "uc_ids": ["CR01-UC01", "CR01-UC02", "CR01-UC03", "CR01-UC04"],
+    {
+      "batch_id": 7,
       "branch": "batch-07-camera-picker",
-      "status": "DONE",
-      "completed_at": "2026-10-14T14:39:00Z",
-      "verification": "PASSED (flutter analyze 0 errors)",
-      "spend_usd": 0.1748
+      "scope": "CR01-UC01..04 (Photo capture, multi-image picker, cloud metadata)",
+      "status": "MERGED_TO_MAIN",
+      "pushed_to_remote": true
     },
-    "BATCH-08": {
-      "name": "Bounded Batch Image Compression & Durable Upload Queue",
-      "cr_ids": ["CR01"],
-      "uc_ids": ["CR01-UC05", "CR01-UC06", "CR01-UC07", "CR01-UC08"],
+    {
+      "batch_id": 8,
       "branch": "batch-08-image-compression-queue",
-      "status": "PENDING"
+      "scope": "CR01-UC05..08 (Background upload queue, chunking, pause/resume)",
+      "status": "MERGED_TO_MAIN",
+      "pushed_to_remote": true
     },
-    "BATCH-09": {
-      "name": "EXIF Scrubbing, GPS Stripping & Server File Sanitization",
-      "cr_ids": ["CR01"],
-      "uc_ids": ["CR01-UC09", "CR01-UC10", "CR01-UC11", "CR01-UC12"],
+    {
+      "batch_id": 9,
       "branch": "batch-09-exif-sanitization",
-      "status": "PENDING"
-    },
-    "BATCH-10": {
-      "name": "Background Removal, Garment Masking & Transparent Canvas",
-      "cr_ids": ["CR01"],
-      "uc_ids": ["CR01-UC13", "CR01-UC14", "CR01-UC15", "CR01-UC16", "CR01-UC17"],
-      "branch": "batch-10-background-removal",
-      "status": "PENDING"
+      "scope": "CR01-UC09..12 (EXIF & GPS metadata sanitization, client privacy modal)",
+      "status": "MERGED_TO_MAIN",
+      "pushed_to_remote": true
     }
-  }
+  ],
+  "next_batch_index": 10,
+  "next_batch_scope": "CR01-UC13..16 (Duplicate photo detection & resolution)",
+  "active_cycle_completed_count": 4,
+  "laptop_memory_safe_cap": 4,
+  "updated_at": "2026-10-14T10:46:30-04:00"
 }

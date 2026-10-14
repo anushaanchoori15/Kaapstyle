@@ -1,0 +1,113 @@
+JOB ID: JOB-B10-FLUTTER-001
+MODE: LIVE API CALL
+REQUEST ID: req_011Cg2KExL6TYub6QTawRNNi
+MODEL: claude-haiku-5-5
+STOP REASON: max_tokens
+IS TRUNCATED: True
+COST USD: 0.020342
+APPLIED FILES:
+  - mobile/lib/features/media/screens/duplicate_review_screen.dart: REJECTED: File content is truncated (missing ***END_FILE*** delimiter). Token limit exceeded.
+
+RAW OUTPUT:
+***FILE: mobile/lib/features/media/screens/duplicate_review_screen.dart***
+```dart
+import 'package:flutter/material.dart';
+
+/// A single photo referenced in a duplicate candidate pair.
+class DuplicatePhoto {
+  const DuplicatePhoto({
+    required this.name,
+    required this.sizeBytes,
+    required this.date,
+  });
+
+  final String name;
+  final int sizeBytes;
+  final DateTime date;
+}
+
+/// Two photos flagged as potential duplicates, with a similarity score (0..1).
+class DuplicatePair {
+  const DuplicatePair({
+    required this.left,
+    required this.right,
+    required this.similarity,
+  });
+
+  final DuplicatePhoto left;
+  final DuplicatePhoto right;
+  final double similarity;
+}
+
+enum DuplicateAction { keepBoth, deleteDuplicate, merge }
+
+/// Side-by-side review of potential duplicate photo pairs.
+class DuplicateReviewScreen extends StatefulWidget {
+  const DuplicateReviewScreen({super.key, this.initialPairs = const []});
+
+  final List<DuplicatePair> initialPairs;
+
+  @override
+  State<DuplicateReviewScreen> createState() => _DuplicateReviewScreenState();
+}
+
+class _DuplicateReviewScreenState extends State<DuplicateReviewScreen> {
+  late List<DuplicatePair> _pairs = List.of(widget.initialPairs);
+
+  void _resolve(int index, DuplicateAction action) {
+    final pair = _pairs[index];
+    setState(() => _pairs.removeAt(index));
+
+    final message = switch (action) {
+      DuplicateAction.keepBoth =>
+        'Kept both "${pair.left.name}" and "${pair.right.name}".',
+      DuplicateAction.deleteDuplicate => 'Deleted "${pair.right.name}".',
+      DuplicateAction.merge => 'Merged into "${pair.left.name}".',
+    };
+
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
+      );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Duplicates (${_pairs.length})')),
+      body: _pairs.isEmpty
+          ? _buildEmptyState(context)
+          : ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: _pairs.length,
+              itemBuilder: (context, i) => _PairCard(
+                pair: _pairs[i],
+                onAction: (action) => _resolve(i, action),
+              ),
+            ),
+    );
+  }
+
+  Widget _buildEmptyState(BuildContext context) {
+    final theme = Theme.of(context);
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.check_circle_outline,
+                size: 64, color: theme.colorScheme.primary),
+            const SizedBox(height: 16),
+            Text('No duplicates to review',
+                style: theme.textTheme.titleMedium),
+            const SizedBox(height: 8),
+            Text(
+              'Your library is clean. New duplicates will appear here.',
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ],
