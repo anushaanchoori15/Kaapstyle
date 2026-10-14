@@ -1,0 +1,25 @@
+{
+  "job_id": "JOB-B04-DB-001",
+  "cr_id": "CR17",
+  "uc_id": "UC12",
+  "task_id": "T01",
+  "subtask_ids": ["B04-DB-ST01"],
+  "priority": "P1",
+  "owner_request": "Write Flyway migration V4__create_profile_and_audit_tables.sql for MySQL with utf8mb4 encoding:\n1. CREATE TABLE user_profiles (user_id BIGINT PRIMARY KEY, display_name VARCHAR(100) NULL, avatar_url VARCHAR(500) NULL, measurement_unit VARCHAR(10) NOT NULL DEFAULT 'METRIC', theme_mode VARCHAR(20) NOT NULL DEFAULT 'SYSTEM', is_family_sharing_enabled BOOLEAN NOT NULL DEFAULT FALSE, is_telemetry_enabled BOOLEAN NOT NULL DEFAULT TRUE, updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, CONSTRAINT fk_profile_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE);\n2. CREATE TABLE security_audit_logs (id BIGINT AUTO_INCREMENT PRIMARY KEY, user_id BIGINT NOT NULL, action_type VARCHAR(50) NOT NULL, ip_address VARCHAR(45) NULL, device_info VARCHAR(255) NULL, status VARCHAR(20) NOT NULL, created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, CONSTRAINT fk_audit_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE, INDEX idx_audit_user_action (user_id, action_type)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;",
+  "worker_role": "AGENT_C_QA",
+  "key_alias": "KEY_C",
+  "model": "claude-haiku-5-5",
+  "allowed_paths": [
+    "backend/src/main/resources/db/migration/V4__create_profile_and_audit_tables.sql"
+  ],
+  "forbidden_paths": [
+    "AGENTS.md",
+    "tools/*",
+    "mobile/*",
+    "reports/*"
+  ],
+  "context_files": [],
+  "max_task_usd": 1.00,
+  "required_tests": [],
+  "approval_status": "APPROVED"
+}

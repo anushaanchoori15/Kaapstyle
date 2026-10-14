@@ -1,0 +1,25 @@
+{
+  "job_id": "JOB-B04-JAVA-002A",
+  "cr_id": "CR17",
+  "uc_id": "UC12",
+  "task_id": "T03",
+  "subtask_ids": ["B04-JAVA-ST03"],
+  "priority": "P1",
+  "owner_request": "Implement backend/src/main/java/com/kaapstyle/profile/service/UserProfileService.java only.\n- Import existing entities/repos: UserProfile, UserProfileRepository, SecurityAuditLog, SecurityAuditLogRepository.\n- Methods:\n  * getProfile(Long userId): returns UserProfile or creates default profile if not exists.\n  * updateProfile(Long userId, String displayName, String avatarUrl, String measurementUnit, String themeMode, Boolean familySharing, Boolean telemetry): updates non-null fields, saves and returns UserProfile.\n  * logSecurityAction(Long userId, String actionType, String ipAddress, String deviceInfo, String status): saves SecurityAuditLog.\n  * getAuditLogs(Long userId): returns List<SecurityAuditLog>.",
+  "worker_role": "AGENT_B_JAVA",
+  "key_alias": "KEY_B",
+  "model": "claude-sonnet-5-5",
+  "allowed_paths": [
+    "backend/src/main/java/com/kaapstyle/profile/service/UserProfileService.java"
+  ],
+  "forbidden_paths": [
+    "AGENTS.md",
+    "tools/*",
+    "mobile/*",
+    "reports/*"
+  ],
+  "context_files": [],
+  "max_task_usd": 1.50,
+  "required_tests": [],
+  "approval_status": "APPROVED"
+}

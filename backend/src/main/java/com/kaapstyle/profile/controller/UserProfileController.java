@@ -1,0 +1,120 @@
+package com.kaapstyle.profile.controller;
+
+import com.kaapstyle.profile.model.SecurityAuditLog;
+import com.kaapstyle.profile.model.UserProfile;
+import com.kaapstyle.profile.service.UserProfileService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+
+/**
+ * REST controller exposing user profile operations.
+ */
+@RestController
+@RequestMapping("/api/profile")
+@CrossOrigin
+public class UserProfileController {
+
+    private final UserProfileService userProfileService;
+
+    public UserProfileController(UserProfileService userProfileService) {
+        this.userProfileService = userProfileService;
+    }
+
+    @GetMapping("/{userId}")
+    public ResponseEntity<UserProfile> getProfile(@PathVariable String userId) {
+        UserProfile profile = userProfileService.getProfile(userId);
+        return ResponseEntity.ok(profile);
+    }
+
+    @PutMapping("/{userId}")
+    public ResponseEntity<UserProfile> updateProfile(@PathVariable String userId,
+                                                     @RequestBody Map<String, Object> request) {
+        if (request == null) {
+            throw new IllegalArgumentException("Request body must not be empty");
+        }
+
+        String displayName = asString(request.get("displayName"), "displayName");
+        String avatarUrl = asString(request.get("avatarUrl"), "avatarUrl");
+        String measurementUnit = asString(request.get("measurementUnit"), "measurementUnit");
+        String themeMode = asString(request.get("themeMode"), "themeMode");
+        Boolean isFamilySharingEnabled = asBoolean(request.get("isFamilySharingEnabled"), "isFamilySharingEnabled");
+        Boolean isTelemetryEnabled = asBoolean(request.get("isTelemetryEnabled"), "isTelemetryEnabled");
+
+        UserProfile updated = userProfileService.updateProfile(
+                userId,
+                displayName,
+                avatarUrl,
+                measurementUnit,
+                themeMode,
+                isFamilySharingEnabled,
+                isTelemetryEnabled
+        );
+        return ResponseEntity.ok(updated);
+    }
+
+    @GetMapping("/{userId}/audit-logs")
+    public ResponseEntity<List<SecurityAuditLog>> getAuditLogs(@PathVariable String userId) {
+        List<SecurityAuditLog> logs = userProfileService.getAuditLogs(userId);
+        return ResponseEntity.ok(logs);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Map<String, Object>> handleIllegalArgument(IllegalArgumentException ex) {
+        return buildError(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
+    @ExceptionHandler(NoSuchElementException.class)
+    public ResponseEntity<Map<String, Object>> handleNotFound(NoSuchElementException ex) {
+        return buildError(HttpStatus.NOT_FOUND, ex.getMessage());
+    }
+
+    private ResponseEntity<Map<String, Object>> buildError(HttpStatus status, String message) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("status", status.value());
+        body.put("error", status.getReasonPhrase());
+        body.put("message", message);
+        return ResponseEntity.status(status).body(body);
+    }
+
+    private String asString(Object value, String fieldName) {
+        if (value == null) {
+            return null;
+        }
+        if (value instanceof String) {
+            return (String) value;
+        }
+        throw new IllegalArgumentException("Field '" + fieldName + "' must be a string");
+    }
+
+    private Boolean asBoolean(Object value, String fieldName) {
+        if (value == null) {
+            return null;
+        }
+        if (value instanceof Boolean) {
+            return (Boolean) value;
+        }
+        if (value instanceof String) {
+            String text = ((String) value).trim();
+            if ("true".equalsIgnoreCase(text)) {
+                return Boolean.TRUE;
+            }
+            if ("false".equalsIgnoreCase(text)) {
+                return Boolean.FALSE;
+            }
+        }
+        throw new IllegalArgumentException("Field '" + fieldName + "' must be a boolean");
+    }
+}

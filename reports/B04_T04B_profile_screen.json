@@ -1,0 +1,25 @@
+{
+  "job_id": "JOB-B04-FLUTTER-001B",
+  "cr_id": "CR17",
+  "uc_id": "UC12",
+  "task_id": "T04",
+  "subtask_ids": ["B04-MOB-ST02"],
+  "priority": "P1",
+  "owner_request": "Implement mobile/lib/features/profile/screens/profile_settings_screen.dart concisely (under 250 lines of clean code):\n- Import '../models/user_profile.dart' and 'package:http/http.dart' as http.\n- StatefulWidget ProfileSettingsScreen({super.key, required this.userId}).\n- In initState, fetch profile via GET /api/profile/{userId}. If network fails, use default UserProfile.\n- Fields: Display Name (TextFormField), Measurement Unit (DropdownButtonFormField for METRIC/IMPERIAL), Theme Mode (Dropdown for SYSTEM/LIGHT/DARK), Privacy toggles (SwitchListTile for family sharing and telemetry).\n- 'Save Changes' button: sends PUT /api/profile/{userId} with updated JSON, shows SnackBar on success.\n- Keep implementation focused and concise.",
+  "worker_role": "AGENT_A_FLUTTER",
+  "key_alias": "KEY_A",
+  "model": "claude-sonnet-5-5",
+  "allowed_paths": [
+    "mobile/lib/features/profile/screens/profile_settings_screen.dart"
+  ],
+  "forbidden_paths": [
+    "AGENTS.md",
+    "tools/*",
+    "backend/*",
+    "reports/*"
+  ],
+  "context_files": [],
+  "max_task_usd": 1.50,
+  "required_tests": [],
+  "approval_status": "APPROVED"
+}

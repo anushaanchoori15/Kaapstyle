@@ -1,0 +1,182 @@
+import 'dart:convert';
+
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+
+import '../models/user_profile.dart';
+
+// Assumed UserProfile contract (../models/user_profile.dart):
+//   fields: displayName, measurementUnit, themeMode,
+//           familySharingEnabled, telemetryEnabled
+//   UserProfile.fromJson(Map<String, dynamic>), toJson(), UserProfile.defaults()
+
+const String _apiBase =
+    String.fromEnvironment('API_BASE_URL', defaultValue: 'http://10.0.2.2:8080');
+
+class ProfileSettingsScreen extends StatefulWidget {
+  const ProfileSettingsScreen({super.key, required this.userId});
+
+  final String userId;
+
+  @override
+  State<ProfileSettingsScreen> createState() => _ProfileSettingsScreenState();
+}
+
+class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
+  static const _units = ['METRIC', 'IMPERIAL'];
+  static const _themes = ['SYSTEM', 'LIGHT', 'DARK'];
+
+  final _formKey = GlobalKey<FormState>();
+  final _nameCtrl = TextEditingController();
+
+  UserProfile _profile = UserProfile.defaults();
+  String _unit = _units.first;
+  String _theme = _themes.first;
+  bool _familySharing = false;
+  bool _telemetry = false;
+  bool _loading = true;
+  bool _saving = false;
+
+  Uri get _uri => Uri.parse('$_apiBase/api/profile/${widget.userId}');
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProfile();
+  }
+
+  @override
+  void dispose() {
+    _nameCtrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadProfile() async {
+    UserProfile profile;
+    try {
+      final res = await http.get(_uri);
+      profile = res.statusCode == 200
+          ? UserProfile.fromJson(jsonDecode(res.body) as Map<String, dynamic>)
+          : UserProfile.defaults();
+    } catch (_) {
+      profile = UserProfile.defaults();
+    }
+    if (!mounted) return;
+    setState(() {
+      _profile = profile;
+      _nameCtrl.text = profile.displayName ?? '';
+      _unit = _units.contains(profile.measurementUnit)
+          ? profile.measurementUnit
+          : _units.first;
+      _theme = _themes.contains(profile.themeMode)
+          ? profile.themeMode
+          : _themes.first;
+      _familySharing = profile.familySharingEnabled;
+      _telemetry = profile.telemetryEnabled;
+      _loading = false;
+    });
+  }
+
+  Future<void> _save() async {
+    if (!_formKey.currentState!.validate()) return;
+    setState(() => _saving = true);
+    final body = {
+      ..._profile.toJson(),
+      'displayName': _nameCtrl.text.trim(),
+      'measurementUnit': _unit,
+      'themeMode': _theme,
+      'familySharingEnabled': _familySharing,
+      'telemetryEnabled': _telemetry,
+    };
+    String message;
+    try {
+      final res = await http.put(
+        _uri,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(body),
+      );
+      message = res.statusCode >= 200 && res.statusCode < 300
+          ? 'Profile saved'
+          : 'Save failed (${res.statusCode})';
+    } catch (_) {
+      message = 'Save failed: network error';
+    }
+    if (!mounted) return;
+    setState(() => _saving = false);
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  DropdownButtonFormField<String> _dropdown(
+    String label,
+    String value,
+    List<String> items,
+    ValueChanged<String> onChanged,
+  ) {
+    return DropdownButtonFormField<String>(
+      initialValue: value,
+      decoration: InputDecoration(labelText: label),
+      items: [
+        for (final i in items) DropdownMenuItem(value: i, child: Text(i)),
+      ],
+      onChanged: (v) {
+        if (v != null) onChanged(v);
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Profile Settings')),
+      body: _loading
+          ? const Center(child: CircularProgressIndicator())
+          : Form(
+              key: _formKey,
+              child: ListView(
+                padding: const EdgeInsets.all(16),
+                children: [
+                  TextFormField(
+                    controller: _nameCtrl,
+                    decoration:
+                        const InputDecoration(labelText: 'Display Name'),
+                    validator: (v) => (v == null || v.trim().isEmpty)
+                        ? 'Display name is required'
+                        : null,
+                  ),
+                  const SizedBox(height: 16),
+                  _dropdown('Measurement Unit', _unit, _units,
+                      (v) => setState(() => _unit = v)),
+                  const SizedBox(height: 16),
+                  _dropdown('Theme Mode', _theme, _themes,
+                      (v) => setState(() => _theme = v)),
+                  const SizedBox(height: 16),
+                  SwitchListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: const Text('Family sharing'),
+                    value: _familySharing,
+                    onChanged: (v) => setState(() => _familySharing = v),
+                  ),
+                  SwitchListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: const Text('Share telemetry'),
+                    value: _telemetry,
+                    onChanged: (v) => setState(() => _telemetry = v),
+                  ),
+                  const SizedBox(height: 24),
+                  FilledButton(
+                    onPressed: _saving ? null : _save,
+                    child: _saving
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Text('Save Changes'),
+                  ),
+                ],
+              ),
+            ),
+    );
+  }
+}

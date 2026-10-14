@@ -1,0 +1,143 @@
+/// User profile model for the profile feature.
+///
+/// Immutable value object representing a user's profile and preferences.
+class UserProfile {
+  /// Allowed values for [measurementUnit].
+  static const String unitMetric = 'METRIC';
+  static const String unitImperial = 'IMPERIAL';
+
+  /// Allowed values for [themeMode].
+  static const String themeSystem = 'SYSTEM';
+  static const String themeLight = 'LIGHT';
+  static const String themeDark = 'DARK';
+
+  final int userId;
+  final String? displayName;
+  final String? avatarUrl;
+
+  /// 'METRIC' or 'IMPERIAL'.
+  final String measurementUnit;
+
+  /// 'SYSTEM', 'LIGHT' or 'DARK'.
+  final String themeMode;
+
+  final bool isFamilySharingEnabled;
+  final bool isTelemetryEnabled;
+
+  const UserProfile({
+    required this.userId,
+    this.displayName,
+    this.avatarUrl,
+    this.measurementUnit = unitMetric,
+    this.themeMode = themeSystem,
+    this.isFamilySharingEnabled = false,
+    this.isTelemetryEnabled = false,
+  });
+
+  /// Default baseline profile instance.
+  factory UserProfile.defaults({int userId = 0}) => UserProfile(
+        userId: userId,
+        displayName: '',
+        measurementUnit: unitMetric,
+        themeMode: themeSystem,
+        isFamilySharingEnabled: false,
+        isTelemetryEnabled: false,
+      );
+
+  bool get familySharingEnabled => isFamilySharingEnabled;
+  bool get telemetryEnabled => isTelemetryEnabled;
+
+  /// Builds a [UserProfile] from a JSON map (snake_case keys, with
+  /// camelCase accepted as a fallback).
+  factory UserProfile.fromJson(Map<String, dynamic> json) {
+    dynamic read(String snake, String camel) =>
+        json.containsKey(snake) ? json[snake] : json[camel];
+
+    final dynamic rawUserId = read('user_id', 'userId');
+    final int userId =
+        rawUserId is num ? rawUserId.toInt() : int.parse(rawUserId.toString());
+
+    return UserProfile(
+      userId: userId,
+      displayName: read('display_name', 'displayName') as String?,
+      avatarUrl: read('avatar_url', 'avatarUrl') as String?,
+      measurementUnit:
+          (read('measurement_unit', 'measurementUnit') as String?) ??
+              unitMetric,
+      themeMode: (read('theme_mode', 'themeMode') as String?) ?? themeSystem,
+      isFamilySharingEnabled:
+          (read('is_family_sharing_enabled', 'isFamilySharingEnabled')
+                  as bool?) ??
+              false,
+      isTelemetryEnabled:
+          (read('is_telemetry_enabled', 'isTelemetryEnabled') as bool?) ??
+              false,
+    );
+  }
+
+  /// Serializes this profile to a JSON map (snake_case keys).
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'user_id': userId,
+      'display_name': displayName,
+      'avatar_url': avatarUrl,
+      'measurement_unit': measurementUnit,
+      'theme_mode': themeMode,
+      'is_family_sharing_enabled': isFamilySharingEnabled,
+      'is_telemetry_enabled': isTelemetryEnabled,
+    };
+  }
+
+  /// Returns a copy with the given fields replaced. [userId] is immutable.
+  UserProfile copyWith({
+    String? displayName,
+    String? avatarUrl,
+    String? measurementUnit,
+    String? themeMode,
+    bool? isFamilySharingEnabled,
+    bool? isTelemetryEnabled,
+  }) {
+    return UserProfile(
+      userId: userId,
+      displayName: displayName ?? this.displayName,
+      avatarUrl: avatarUrl ?? this.avatarUrl,
+      measurementUnit: measurementUnit ?? this.measurementUnit,
+      themeMode: themeMode ?? this.themeMode,
+      isFamilySharingEnabled:
+          isFamilySharingEnabled ?? this.isFamilySharingEnabled,
+      isTelemetryEnabled: isTelemetryEnabled ?? this.isTelemetryEnabled,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is UserProfile &&
+        other.userId == userId &&
+        other.displayName == displayName &&
+        other.avatarUrl == avatarUrl &&
+        other.measurementUnit == measurementUnit &&
+        other.themeMode == themeMode &&
+        other.isFamilySharingEnabled == isFamilySharingEnabled &&
+        other.isTelemetryEnabled == isTelemetryEnabled;
+  }
+
+  @override
+  int get hashCode => Object.hash(
+        userId,
+        displayName,
+        avatarUrl,
+        measurementUnit,
+        themeMode,
+        isFamilySharingEnabled,
+        isTelemetryEnabled,
+      );
+
+  @override
+  String toString() =>
+      'UserProfile(userId: $userId, displayName: $displayName, '
+      'avatarUrl: $avatarUrl, measurementUnit: $measurementUnit, '
+      'themeMode: $themeMode, '
+      'isFamilySharingEnabled: $isFamilySharingEnabled, '
+      'isTelemetryEnabled: $isTelemetryEnabled)';
+}
