@@ -1,0 +1,25 @@
+{
+  "job_id": "JOB-B06-DB-001",
+  "cr_id": "CR15",
+  "uc_id": "UC01",
+  "task_id": "T01",
+  "subtask_ids": ["B06-DB-ST01"],
+  "priority": "P0",
+  "owner_request": "Write Flyway migration V6__create_security_defense_tables.sql for MySQL with utf8mb4 encoding:\n1. CREATE TABLE ip_rate_limit_records (id BIGINT AUTO_INCREMENT PRIMARY KEY, ip_address VARCHAR(45) NOT NULL, endpoint_group VARCHAR(50) NOT NULL, request_count INT NOT NULL DEFAULT 1, window_start TIMESTAMP NOT NULL, blocked_until TIMESTAMP NULL, INDEX idx_ip_endpoint (ip_address, endpoint_group));\n2. CREATE TABLE account_lockout_records (user_id BIGINT PRIMARY KEY, failed_attempts INT NOT NULL DEFAULT 0, locked_until TIMESTAMP NULL, last_failed_at TIMESTAMP NULL, updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, CONSTRAINT fk_lockout_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;",
+  "worker_role": "AGENT_C_QA",
+  "key_alias": "KEY_C",
+  "model": "claude-haiku-5-5",
+  "allowed_paths": [
+    "backend/src/main/resources/db/migration/V6__create_security_defense_tables.sql"
+  ],
+  "forbidden_paths": [
+    "AGENTS.md",
+    "tools/*",
+    "mobile/*",
+    "reports/*"
+  ],
+  "context_files": [],
+  "max_task_usd": 1.00,
+  "required_tests": [],
+  "approval_status": "APPROVED"
+}

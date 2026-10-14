@@ -1,0 +1,25 @@
+{
+  "job_id": "JOB-B06-JAVA-002A",
+  "cr_id": "CR15",
+  "uc_id": "UC01",
+  "task_id": "T03",
+  "subtask_ids": ["B06-JAVA-ST03"],
+  "priority": "P0",
+  "owner_request": "Implement backend/src/main/java/com/kaapstyle/security/service/SecurityDefenseService.java only.\n- Autowire IpRateLimitRecordRepository, AccountLockoutRecordRepository.\n- Methods:\n  * checkRateLimit(String ipAddress, String endpointGroup, int maxRequestsPerMinute): returns true if within limit, throws ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS, 'Rate limit exceeded') if blocked.\n  * recordFailedLogin(Long userId): increments failedAttempts. If >= 5, locks account for 15 minutes.\n  * resetFailedLogins(Long userId): clears lockout record on successful login.\n  * isAccountLocked(Long userId): returns boolean whether account is currently locked.",
+  "worker_role": "AGENT_B_JAVA",
+  "key_alias": "KEY_B",
+  "model": "claude-sonnet-5-5",
+  "allowed_paths": [
+    "backend/src/main/java/com/kaapstyle/security/service/SecurityDefenseService.java"
+  ],
+  "forbidden_paths": [
+    "AGENTS.md",
+    "tools/*",
+    "mobile/*",
+    "reports/*"
+  ],
+  "context_files": [],
+  "max_task_usd": 1.50,
+  "required_tests": [],
+  "approval_status": "APPROVED"
+}
