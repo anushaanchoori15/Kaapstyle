@@ -1,0 +1,25 @@
+{
+  "job_id": "JOB-B28-DB-001",
+  "cr_id": "CR10",
+  "uc_id": "UC01",
+  "task_id": "T01",
+  "subtask_ids": ["B28-DB-ST01"],
+  "priority": "P0",
+  "owner_request": "Write Flyway migration V28__create_family_groups_tables.sql for MySQL with utf8mb4 encoding:\nCREATE TABLE family_groups (\n  id BIGINT AUTO_INCREMENT PRIMARY KEY,\n  group_name VARCHAR(100) NOT NULL,\n  owner_user_id BIGINT NOT NULL,\n  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  CONSTRAINT fk_fam_owner FOREIGN KEY (owner_user_id) REFERENCES users(id) ON DELETE CASCADE\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;\n\nCREATE TABLE family_members (\n  group_id BIGINT NOT NULL,\n  user_id BIGINT NOT NULL,\n  member_role VARCHAR(30) NOT NULL DEFAULT 'MEMBER',\n  joined_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  PRIMARY KEY (group_id, user_id),\n  CONSTRAINT fk_fammem_group FOREIGN KEY (group_id) REFERENCES family_groups(id) ON DELETE CASCADE,\n  CONSTRAINT fk_fammem_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;",
+  "worker_role": "AGENT_C_QA",
+  "key_alias": "KEY_C",
+  "model": "claude-haiku-5-5",
+  "allowed_paths": [
+    "backend/src/main/resources/db/migration/V28__create_family_groups_tables.sql"
+  ],
+  "forbidden_paths": [
+    "AGENTS.md",
+    "tools/*",
+    "mobile/*",
+    "reports/*"
+  ],
+  "context_files": [],
+  "max_task_usd": 1.00,
+  "required_tests": [],
+  "approval_status": "APPROVED"
+}
